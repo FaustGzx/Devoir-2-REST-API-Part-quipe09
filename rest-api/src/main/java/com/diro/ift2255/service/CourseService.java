@@ -41,4 +41,32 @@ public class CourseService {
             return Optional.empty();
         }
     }
+
+    
+
+    /**
+     * Comparer des cours
+     * @param courseIds Liste d'ID de cours à comparer
+     * @return Liste des cours correspondants
+     */
+    public List<Course> compareCourses(List<String> courseIds) {
+    if (courseIds == null || courseIds.isEmpty()) {
+        return List.of();
+    }
+
+    List<Course> result = new java.util.ArrayList<>();
+
+    for (String id : courseIds) {
+        if (id == null || id.isBlank()) {
+            continue;
+        }
+
+        
+        getCourseById(id.trim()).ifPresent(result::add);
+    }
+
+    return result;
+}
+
+
 }

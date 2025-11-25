@@ -30,7 +30,14 @@ public class Routes {
         CourseService courseService = new CourseService(new HttpClientApi());
         CourseController courseController = new CourseController(courseService);
 
+        // CU1 : Recherche de cours
         app.get("/courses", courseController::getAllCourses);
+
+        // CU3 : Comparer des cours —— 注意：一定要放在 {id} 前面
+        app.get("/courses/comparer", courseController::compareCourses);
+
+        // CU2 : Détails d'un cours
         app.get("/courses/{id}", courseController::getCourseById);
     }
 }
+

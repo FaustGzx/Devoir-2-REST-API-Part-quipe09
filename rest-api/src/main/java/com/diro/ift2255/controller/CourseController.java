@@ -59,6 +59,39 @@ public class CourseController {
         return courseId != null && courseId.trim().length() >= 6;
     }
 
+        /**
+     * Compare plusieurs cours à partir d'une liste d'IDs.
+     * Exemple :
+     *   GET /courses/comparer?ids=ARC1102,IFT2255,IFT2015
+     */
+    public void compareCourses(Context ctx) {
+    String idsParam = ctx.queryParam("ids");
+
+    if (idsParam == null || idsParam.isBlank()) {
+        ctx.status(400).json(ResponseUtil.formatError(
+                "Le paramètre 'ids' est requis (ex: ids=ARC1102,IFT2255)."));
+        return;
+    }
+
+    String[] parts = idsParam.split(",");
+    java.util.List<String> ids = new java.util.ArrayList<>();
+    for (String p : parts) {
+        if (p != null && !p.isBlank()) {
+            ids.add(p.trim());
+        }
+    }
+
+    if (ids.isEmpty()) {
+        ctx.status(400).json(ResponseUtil.formatError(
+                "Le paramètre 'ids' ne contient aucun identifiant valide."));
+        return;
+    }
+
+    List<Course> courses = service.compareCourses(ids);
+    ctx.json(courses);
+}
+
+
     /**
      * Récupère tous les paramètres de requête depuis l'URL et les met dans une Map
      * @param ctx Contexte Javalin représentant la requête HTTP
