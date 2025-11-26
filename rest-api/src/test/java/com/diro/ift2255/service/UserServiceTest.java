@@ -45,7 +45,7 @@ public class UserServiceTest {
 
         // ASSERT
         try {
-            assertEquals(3, users.size(), "Should have 2 mock users");
+            assertEquals(2, users.size(), "Should have 2 mock users");
             OK("Retrieved " + users.size() + " users as expected");
         } catch (AssertionError e) {
             Err(e.getMessage());
