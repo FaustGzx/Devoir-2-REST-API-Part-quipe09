@@ -14,20 +14,26 @@ public class Course {
     private String name;
     private String description;
 
-    // Champs supplémentaires vus dans le screenshot Planifium
-    private String prerequis;
-
+    // Champs supplémentaires pertinents de l'API Planifium
     @JsonProperty("prerequisite_courses")
     private List<String> prerequisiteCourses;
 
-    private String semester;
+    // Nombre de crédits du cours
+    private Double credits;
 
-    @JsonProperty("semester_int")
-    private Integer semesterInt;
+    // Texte lisible des prérequis (ex: "Préalable : IFT1025")
+    @JsonProperty("requirement_text")
+    private String requirementText;
 
-    private String sigle;
+    // Trimestres où le cours est offert (autumn, winter, summer)
+    @JsonProperty("available_terms")
+    private Map<String, Boolean> availableTerms;
 
-    // Liste des horaires / offres du cours
+    // Périodes où le cours est offert (daytime, evening)
+    @JsonProperty("available_periods")
+    private Map<String, Boolean> availablePeriods;
+
+    // Liste des horaires / offres du cours (sections, profs, etc.)
     private List<Schedule> schedules;
 
     // ----- Constructeurs -----
@@ -62,17 +68,9 @@ public class Course {
         return description;
     }
 
-    // (bug corrigé ici : ce n’est plus "email")
+    // (bug corrigé : ce n'est plus "email")
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getPrerequis() {
-        return prerequis;
-    }
-
-    public void setPrerequis(String prerequis) {
-        this.prerequis = prerequis;
     }
 
     public List<String> getPrerequisiteCourses() {
@@ -83,28 +81,36 @@ public class Course {
         this.prerequisiteCourses = prerequisiteCourses;
     }
 
-    public String getSemester() {
-        return semester;
+    public Double getCredits() {
+        return credits;
     }
 
-    public void setSemester(String semester) {
-        this.semester = semester;
+    public void setCredits(Double credits) {
+        this.credits = credits;
     }
 
-    public Integer getSemesterInt() {
-        return semesterInt;
+    public String getRequirementText() {
+        return requirementText;
     }
 
-    public void setSemesterInt(Integer semesterInt) {
-        this.semesterInt = semesterInt;
+    public void setRequirementText(String requirementText) {
+        this.requirementText = requirementText;
     }
 
-    public String getSigle() {
-        return sigle;
+    public Map<String, Boolean> getAvailableTerms() {
+        return availableTerms;
     }
 
-    public void setSigle(String sigle) {
-        this.sigle = sigle;
+    public void setAvailableTerms(Map<String, Boolean> availableTerms) {
+        this.availableTerms = availableTerms;
+    }
+
+    public Map<String, Boolean> getAvailablePeriods() {
+        return availablePeriods;
+    }
+
+    public void setAvailablePeriods(Map<String, Boolean> availablePeriods) {
+        this.availablePeriods = availablePeriods;
     }
 
     public List<Schedule> getSchedules() {
@@ -161,7 +167,7 @@ public class Course {
 
         private String name;
 
-        // Dans le JSON c’est "capacity": "130" → on garde String pour ne pas casser
+        // Dans le JSON c’est "capacity": "130" → on garde String pour être souple
         private String capacity;
 
         @JsonProperty("number_inscription")
