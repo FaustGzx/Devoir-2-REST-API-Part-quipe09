@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-
 public class CourseController {
     // Service qui contient la logique métier pour la manipulation des cours et la communication avec les services externes
     private final CourseService service;
@@ -32,7 +31,11 @@ public class CourseController {
 
     /**
      * Récupère un cours spécifique par son ID.
-     * @param ctx Contexte Javalin représentant la requête et la réponse HTTP
+     * Peut aussi transmettre des paramètres comme include_schedule et schedule_semester
+     * à l'API Planifium.
+     *
+     * Exemple :
+     *   GET /courses/IFT1015?include_schedule=true&schedule_semester=A25
      */
     public void getCourseById(Context ctx) {
         String id = ctx.pathParam("id");
@@ -42,7 +45,11 @@ public class CourseController {
             return;
         }
 
-        Optional<Course> course = service.getCourseById(id);
+        // Récupère tous les query params (include_schedule, schedule_semester, etc.)
+        Map<String, String> queryParams = extractQueryParams(ctx);
+
+        Optional<Course> course = service.getCourseById(id, queryParams);
+
         if (course.isPresent()) {
             ctx.json(course.get());
         } else {
@@ -59,38 +66,43 @@ public class CourseController {
         return courseId != null && courseId.trim().length() >= 6;
     }
 
-        /**
+    /**
      * Compare plusieurs cours à partir d'une liste d'IDs.
      * Exemple :
-     *   GET /courses/comparer?ids=ARC1102,IFT2255,IFT2015
+     *   GET /courses/comparer?ids=ARC1102,IFT2255,IFT2015&include_schedule=true&schedule_semester=A25
      */
     public void compareCourses(Context ctx) {
-    String idsParam = ctx.queryParam("ids");
+        String idsParam = ctx.queryParam("ids");
 
-    if (idsParam == null || idsParam.isBlank()) {
-        ctx.status(400).json(ResponseUtil.formatError(
-                "Le paramètre 'ids' est requis (ex: ids=ARC1102,IFT2255)."));
-        return;
-    }
-
-    String[] parts = idsParam.split(",");
-    java.util.List<String> ids = new java.util.ArrayList<>();
-    for (String p : parts) {
-        if (p != null && !p.isBlank()) {
-            ids.add(p.trim());
+        if (idsParam == null || idsParam.isBlank()) {
+            ctx.status(400).json(ResponseUtil.formatError(
+                    "Le paramètre 'ids' est requis (ex: ids=ARC1102,IFT2255)."));
+            return;
         }
+
+        String[] parts = idsParam.split(",");
+        java.util.List<String> ids = new java.util.ArrayList<>();
+        for (String p : parts) {
+            if (p != null && !p.isBlank()) {
+                ids.add(p.trim());
+            }
+        }
+
+        if (ids.isEmpty()) {
+            ctx.status(400).json(ResponseUtil.formatError(
+                    "Le paramètre 'ids' ne contient aucun identifiant valide."));
+            return;
+        }
+
+        // On récupère tous les query params (include_schedule, schedule_semester, etc.)
+        Map<String, String> queryParams = extractQueryParams(ctx);
+        // On enlève "ids" des query params pour ne pas le renvoyer à Planifium
+        queryParams.remove("ids");
+
+        // On transmet aussi ces paramètres au service
+        List<Course> courses = service.compareCourses(ids, queryParams);
+        ctx.json(courses);
     }
-
-    if (ids.isEmpty()) {
-        ctx.status(400).json(ResponseUtil.formatError(
-                "Le paramètre 'ids' ne contient aucun identifiant valide."));
-        return;
-    }
-
-    List<Course> courses = service.compareCourses(ids);
-    ctx.json(courses);
-}
-
 
     /**
      * Récupère tous les paramètres de requête depuis l'URL et les met dans une Map

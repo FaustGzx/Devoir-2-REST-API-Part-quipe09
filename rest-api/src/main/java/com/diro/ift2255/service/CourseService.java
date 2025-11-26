@@ -42,31 +42,41 @@ public class CourseService {
         }
     }
 
-    
-
     /**
-     * Comparer des cours
+     * Comparer des cours - version simple (compatibilité)
      * @param courseIds Liste d'ID de cours à comparer
      * @return Liste des cours correspondants
      */
     public List<Course> compareCourses(List<String> courseIds) {
-    if (courseIds == null || courseIds.isEmpty()) {
-        return List.of();
+        return compareCourses(courseIds, null);
     }
 
-    List<Course> result = new java.util.ArrayList<>();
-
-    for (String id : courseIds) {
-        if (id == null || id.isBlank()) {
-            continue;
+    /**
+     * Comparer des cours - version avec paramètres (ex: include_schedule, schedule_semester).
+     * @param courseIds   Liste d'ID de cours à comparer
+     * @param queryParams Paramètres supplémentaires à transmettre à l'API Planifium
+     * @return Liste des cours correspondants
+     */
+    public List<Course> compareCourses(List<String> courseIds, Map<String, String> queryParams) {
+        if (courseIds == null || courseIds.isEmpty()) {
+            return List.of();
         }
 
-        
-        getCourseById(id.trim()).ifPresent(result::add);
+        Map<String, String> params = (queryParams == null)
+                ? Collections.emptyMap()
+                : queryParams;
+
+        List<Course> result = new ArrayList<>();
+
+        for (String id : courseIds) {
+            if (id == null || id.isBlank()) {
+                continue;
+            }
+
+            // On utilise la version de getCourseById qui accepte aussi les query params
+            getCourseById(id.trim(), params).ifPresent(result::add);
+        }
+
+        return result;
     }
-
-    return result;
-}
-
-
 }
