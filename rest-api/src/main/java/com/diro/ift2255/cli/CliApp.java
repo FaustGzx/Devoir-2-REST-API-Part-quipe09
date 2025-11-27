@@ -176,13 +176,8 @@ public class CliApp {
             System.out.println();
             System.out.println("Crédits : " + (c.getCredits() != null ? c.getCredits() : "?"));
 
-            // Pré-requis 
-            List<String> prereqs = c.getPrerequisiteCourses();
-            if (prereqs == null || prereqs.isEmpty()) {
-                System.out.println("Pré-requis : Aucun");
-            } else {
-                System.out.println("Pré-requis : " + String.join(", ", prereqs));
-            }
+            // Pré-requis
+            System.out.println("Pré-requis : " + buildPrereqDisplay(c));
 
 
             // Sessions offertes
@@ -295,14 +290,10 @@ public class CliApp {
                 System.out.println("-------------------------------------");
                 System.out.println(c.getId() + " - " + c.getName());
                 System.out.println("Crédits : " + (c.getCredits() != null ? c.getCredits() : "?"));
+                
+                // Pré-requis
+                System.out.println("Pré-requis : " + buildPrereqDisplay(c));
 
-                if (c.getRequirementText() != null) {
-                    System.out.println("Pré-requis : " + c.getRequirementText());
-                } else if (c.getPrerequisiteCourses() != null && !c.getPrerequisiteCourses().isEmpty()) {
-                    System.out.println("Pré-requis : " + String.join(", ", c.getPrerequisiteCourses()));
-                } else {
-                    System.out.println("Pré-requis : aucun");
-                }
 
                 if (c.getAvailableTerms() != null && !c.getAvailableTerms().isEmpty()) {
                     System.out.println("Sessions : " + formatTerms(c.getAvailableTerms()));
@@ -372,4 +363,42 @@ public class CliApp {
         if (Boolean.TRUE.equals(periods.get("evening"))) active.add("soir");
         return active.isEmpty() ? "aucune info" : String.join(", ", active);
     }
+
+        /**
+     * Retourne une version "propre" des prérequis à afficher.
+     * - Si requirement_text est présent, on le nettoie (on enlève le préfixe moche).
+     * - Sinon on utilise la liste prerequisite_courses.
+     * - Sinon "Aucun".
+     */
+    private String buildPrereqDisplay(Course c) {
+        String txt = c.getRequirementText();
+        List<String> prereqs = c.getPrerequisiteCourses();
+
+        // 1) On essaie d'utiliser requirement_text si dispo
+        if (txt != null && !txt.isBlank()) {
+            String cleaned = txt.trim();
+
+            // Souvent ça ressemble à : "prerequisite_courses :  IFT2015 ET (MAT1978 OU ...)"
+            String lower = cleaned.toLowerCase(Locale.ROOT);
+            int idx = lower.indexOf("prerequisite_courses");
+            if (idx != -1) {
+                int colonIdx = cleaned.indexOf(':', idx);
+                if (colonIdx != -1 && colonIdx + 1 < cleaned.length()) {
+                    cleaned = cleaned.substring(colonIdx + 1).trim();
+                }
+            }
+
+            // On retourne juste "IFT2015 ET (MAT1978 OU MAT1720 OU STT1700)"
+            return cleaned;
+        }
+
+        // 2) Sinon on tombe back sur la liste brute
+        if (prereqs != null && !prereqs.isEmpty()) {
+            return String.join(", ", prereqs);
+        }
+
+        // 3) Sinon rien
+        return "Aucun";
+    }
+
 }
