@@ -33,11 +33,15 @@ public class Routes {
         // CU1 : Recherche de cours
         app.get("/courses", courseController::getAllCourses);
 
-        // CU3 : Comparer des cours —— 注意：一定要放在 {id} 前面
+        // CU3 : Comparer des cours (doit rester avant /courses/{id})
         app.get("/courses/comparer", courseController::compareCourses);
+
+        // Vérifier l'éligibilité à un cours (basé sur les prérequis + cours déjà faits)
+        // Exemple :
+        //   GET /courses/IFT2255/eligibility?completed=IFT1015,IFT1025
+        app.get("/courses/{id}/eligibility", courseController::getEligibility);
 
         // CU2 : Détails d'un cours
         app.get("/courses/{id}", courseController::getCourseById);
     }
 }
-

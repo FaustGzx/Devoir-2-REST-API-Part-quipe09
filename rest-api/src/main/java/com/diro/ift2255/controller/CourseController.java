@@ -4,11 +4,13 @@ import io.javalin.http.Context;
 import com.diro.ift2255.model.Course;
 import com.diro.ift2255.service.CourseService;
 import com.diro.ift2255.util.ResponseUtil;
+import com.diro.ift2255.model.EligibilityResult;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Arrays;
 
 public class CourseController {
     // Service qui contient la logique métier pour la manipulation des cours et la communication avec les services externes
@@ -120,4 +122,33 @@ public class CourseController {
 
         return queryParams;
     }
+
+        /**
+     * Vérifie l'éligibilité d'un étudiant à un cours donné, en fonction
+     * des cours qu'il a déjà complétés.
+     *
+     * Exemple :
+     *   GET /courses/IFT2255/eligibility?completed=IFT1015,IFT1025
+     */
+    public void getEligibility(Context ctx) {
+        String id = ctx.pathParam("id");
+
+        // Récupération de la liste des cours complétés via un paramètre de requête
+        // ex : ?completed=IFT1015,IFT1025
+        String completedParam = ctx.queryParam("completed");
+
+        java.util.List<String> completed;
+        if (completedParam == null || completedParam.isBlank()) {
+            completed = java.util.List.of();
+        } else {
+            completed = Arrays.stream(completedParam.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .toList();
+        }
+
+        EligibilityResult result = service.checkEligibility(id, completed);
+        ctx.json(result);
+    }
+
 }
