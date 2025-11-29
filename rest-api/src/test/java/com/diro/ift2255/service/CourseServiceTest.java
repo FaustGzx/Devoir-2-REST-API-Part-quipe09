@@ -65,7 +65,7 @@ public class CourseServiceTest {
     void testGetAllCourses_filtreParNom() {
 
         Course c = new Course("IFT1015", "Programmation 1", "Intro à la programmation");
-        fakeClient.coursesToReturn = c;
+        fakeClient.courseToReturn = c;
         fakeClient.throwOnGetCourse = false;
 
         Optional<Course> result = courseService.getCourseById("IFT1015");
