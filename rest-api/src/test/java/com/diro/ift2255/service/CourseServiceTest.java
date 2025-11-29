@@ -60,6 +60,22 @@ public class CourseServiceTest {
         assertTrue(result.isEmpty());
     }
 
+    @Test
+    @DisplayName("CU Recherche - getCourseById retourne le bon ID de cours")
+    void testGetAllCourses_filtreParNom() {
+
+        Course c = new Course("IFT1015", "Programmation 1", "Intro à la programmation");
+        fakeClient.coursesToReturn = c;
+        fakeClient.throwOnGetCourse = false;
+
+        Optional<Course> result = courseService.getCourseById("IFT1015");
+
+        assertTrue(result.isPresent());
+        assertEquals("IFT1015", result.get().getId());
+    }
+
+    
+
     // ========================================================================
     // CU : Voir les détails d'un cours
     // ========================================================================
@@ -82,6 +98,30 @@ public class CourseServiceTest {
         assertEquals(3.0, result.get().getCredits());
         assertEquals("Préalable : IFT1025", result.get().getRequirementText());
     }
+
+    @Test
+    @DisplayName("CU Détail - retourne Optional.empty() quand l'ID est vide")
+    void testGetCourseById_idInvalideRetourneEmpty() {
+        fakeClient.throwOnGetCourse = true; // Simule une erreur API
+
+        Optional<Course> result = courseService.getCourseById("   ");
+
+        assertTrue(result.isEmpty());
+    }
+    @Test
+    @DisplayName("CU Détail - retourne Optional.empty() lorsque le cours n'existe pas")
+    void testGetCourseById_coursInexistantRetourneEmpty() {
+
+        fakeClient.courseToReturn = null;  
+        fakeClient.throwOnGetCourse = false;
+
+        Optional<Course> result = courseService.getCourseById("IFT9999");
+
+        assertTrue(result.isEmpty());
+    }
+
+
+
 
     // ========================================================================
     // CU : Éligibilité à un cours
@@ -144,6 +184,21 @@ public class CourseServiceTest {
         assertEquals("IFT1015", result.get(0).getId());
         assertEquals("IFT2035", result.get(1).getId());
     }
+
+    @Test
+    @DisplayName("CU Comparer - retourne une liste vide quand l’API ne retourne aucun cours")
+    void testCompareCourses_retourneListeVideQuandApiVide() {
+
+
+        fakeClient.coursesToReturn = List.of();
+
+        List<String> ids = List.of("IFT1015", "IFT2035");
+
+        List<Course> result = courseService.compareCourses(ids);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty(), "La liste doit être vide si l’API n’a rien retourné");
+    }   
 
     // ========================================================================
     // Fake client HTTP pour isoler CourseService de l'API réelle
