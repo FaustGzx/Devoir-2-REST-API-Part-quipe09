@@ -198,7 +198,53 @@ public class CourseServiceTest {
 
         assertNotNull(result);
         assertTrue(result.isEmpty(), "La liste doit être vide si l’API n’a rien retourné");
-    }   
+    }  
+    
+    @Test
+    @DisplayName("CU Comparer - retourne liste vide quand la liste d'IDs est vide")
+    void testCompareCourses_retourneListeVideQuandIdsVides() {
+        List<Course> result = courseService.compareCourses(Collections.emptyList());
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty(), "La liste doit être vide quand aucun ID n'est fourni");
+    }
+
+    @Test
+    @DisplayName("CU Comparer - ignore les IDs nuls ou vides et ne retourne que les cours valides")
+    void testCompareCourses_ignoreIdsInvalides() {
+        Course c = new Course("IFT1015", "Programmation 1", "Intro");
+        c.setCredits(3.0);
+
+        
+        fakeClient.courseToReturn = c;
+        fakeClient.throwOnGetCourse = false;
+
+        
+        List<String> ids = Arrays.asList("   ", null, "IFT1015");
+
+        List<Course> result = courseService.compareCourses(ids);
+
+        assertNotNull(result);
+        assertEquals(1, result.size(), "Un seul ID valide doit être pris en compte");
+        assertEquals("IFT1015", result.get(0).getId());
+    }
+
+    @Test
+    @DisplayName("CU Comparer - retourne liste vide quand l'API lève une exception")
+    void testCompareCourses_retourneListeVideQuandApiException() {
+        // Fake client：在 get(URI, Class) 时抛 RuntimeException
+        fakeClient.throwOnGetCourse = true;
+
+        List<String> ids = List.of("IFT1015", "IFT2035");
+
+        List<Course> result = courseService.compareCourses(ids);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty(),
+                "En cas d'erreur API, compareCourses doit retourner une liste vide et ne pas planter");
+    }
+
+
 
     // ========================================================================
     // Fake client HTTP pour isoler CourseService de l'API réelle
