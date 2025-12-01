@@ -63,7 +63,6 @@ public class CourseServiceTest {
     @Test
     @DisplayName("CU Recherche - getCourseById retourne le bon ID de cours")
     void testGetAllCourses_filtreParNom() {
-
         Course c = new Course("IFT1015", "Programmation 1", "Intro à la programmation");
         fakeClient.courseToReturn = c;
         fakeClient.throwOnGetCourse = false;
@@ -73,8 +72,6 @@ public class CourseServiceTest {
         assertTrue(result.isPresent());
         assertEquals("IFT1015", result.get().getId());
     }
-
-    
 
     // ========================================================================
     // CU : Voir les détails d'un cours
@@ -108,20 +105,17 @@ public class CourseServiceTest {
 
         assertTrue(result.isEmpty());
     }
+
     @Test
     @DisplayName("CU Détail - retourne Optional.empty() lorsque le cours n'existe pas")
     void testGetCourseById_coursInexistantRetourneEmpty() {
-
-        fakeClient.courseToReturn = null;  
+        fakeClient.courseToReturn = null;
         fakeClient.throwOnGetCourse = false;
 
         Optional<Course> result = courseService.getCourseById("IFT9999");
 
         assertTrue(result.isEmpty());
     }
-
-
-
 
     // ========================================================================
     // CU : Éligibilité à un cours
@@ -166,25 +160,36 @@ public class CourseServiceTest {
     // ========================================================================
 
     @Test
+    @DisplayName("CU Comparer - compareCourses retourne une liste vide si la liste d'IDs est nulle ou vide")
+    void testCompareCourses_retourneListeVideQuandListeIdsNulleOuVide() {
+        List<Course> resultNull = courseService.compareCourses(null);
+        List<Course> resultVide = courseService.compareCourses(List.of());
+
+        assertNotNull(resultNull, "Le résultat pour une liste nulle ne doit pas être nul");
+        assertTrue(resultNull.isEmpty(), "Le résultat pour une liste nulle doit être vide");
+
+        assertNotNull(resultVide, "Le résultat pour une liste vide ne doit pas être nul");
+        assertTrue(resultVide.isEmpty(), "Le résultat pour une liste vide doit être vide");
+    }
+
+    @Test
     @DisplayName("CU Comparer - retourne liste vide quand la liste d'IDs est vide")
     void testCompareCourses_retourneListeVideQuandIdsVides() {
         Course c1 = new Course("IFT1015", "Programmation 1", "Intro");
         c1.setCredits(3.0);
         Course c2 = new Course("IFT2035", "Concepts des langages de programmation", "Cours de C");
-        // Simule la réponse de l'API
         fakeClient.coursesToReturn = List.of(c1, c2);
 
         List<String> ids = List.of("IFT1015", "IFT2035");
 
         Map<String, String> params = Map.of(
-            "include_schedule", "true",
-            "schedule_semester", "A25"
-            );
-         // ACT
-         List<Course> result = courseService.compareCourses(ids, params);
+                "include_schedule", "true",
+                "schedule_semester", "A25"
+        );
 
-         // ASSERT
-         assertNotNull(result);
+        List<Course> result = courseService.compareCourses(ids, params);
+
+        assertNotNull(result);
     }
 
     @Test
@@ -193,11 +198,9 @@ public class CourseServiceTest {
         Course c = new Course("IFT1015", "Programmation 1", "Intro");
         c.setCredits(3.0);
 
-        
         fakeClient.courseToReturn = c;
         fakeClient.throwOnGetCourse = false;
 
-        
         List<String> ids = Arrays.asList("   ", null, "IFT1015");
 
         List<Course> result = courseService.compareCourses(ids);
@@ -210,7 +213,6 @@ public class CourseServiceTest {
     @Test
     @DisplayName("CU Comparer - retourne liste vide quand l'API lève une exception")
     void testCompareCourses_retourneListeVideQuandApiException() {
-        // Fake client：在 get(URI, Class) 时抛 RuntimeException
         fakeClient.throwOnGetCourse = true;
 
         List<String> ids = List.of("IFT1015", "IFT2035");
@@ -221,8 +223,6 @@ public class CourseServiceTest {
         assertTrue(result.isEmpty(),
                 "En cas d'erreur API, compareCourses doit retourner une liste vide et ne pas planter");
     }
-
-
 
     // ========================================================================
     // Fake client HTTP pour isoler CourseService de l'API réelle
