@@ -58,7 +58,7 @@ public class CliApp {
                 case "4" -> handleCompareCourses();
                 case "0" -> {
                     running = false;
-                    System.out.println("Au revoir 👋");
+                    System.out.println("Au revoir!");
                 }
                 default -> System.out.println("Option invalide, essaie encore.");
             }
@@ -240,7 +240,7 @@ public class CliApp {
 
             System.out.println();
             System.out.println("Résultat pour " + code + " :");
-            System.out.println("- Éligible : " + (result.isEligible() ? "OUI ✅" : "NON ❌"));
+            System.out.println("- Éligible : " + (result.isEligible() ? "OUI" : "NON"));
 
             if (!result.getMissingPrerequisites().isEmpty()) {
                 System.out.println("- Pré-requis manquants : "

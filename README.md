@@ -60,3 +60,57 @@ Ce template suit principalement le modèle MVC :
 - Centralisez les routes dans `config/Routes.java` pour simplifier l’ajout de nouveaux endpoints.
 - Ajoutez des **tests unitaires** pour chaque méthode de service.
 - Conservez un style de code uniforme (respect du standard Java).
+
+
+## Prérequis
+
+- **Java 17**
+- **Maven 3.x**
+
+## Vérifier les installations :
+
+java -version
+mvn -v
+
+## Installation:
+
+**Cloner le dépôt puis se placer dans le module** :
+
+git clone <https://github.com/FaustGzx/ift2255-devoir2.git>
+cd ift2255-devoir2/rest-api
+
+**Télécharger les dépendances** :
+
+mvn clean compile
+## Exécution de l’application :
+
+1. **Lancer le serveur REST (Javalin)**
+
+cd ift2255-devoir2/rest-api
+mvn exec:java -Dexec.mainClass="com.diro.ift2255.Main"
+Serveur disponible à : http://localhost:7070
+
+2. **Lancer la CLI**
+
+cd ift2255-devoir2/rest-api
+mvn exec:java -Dexec.mainClass="com.diro.ift2255.cli.CliApp"
+
+La CLI permet de :
+
+Rechercher des cours
+
+Consulter les détails
+
+Vérifier l’éligibilité
+
+Comparer des cours et estimer la charge totale
+
+## Lancer les tests
+Tous les tests JUnit se trouvent dans src/test/java.
+
+**Lancer tous les tests** :
+
+mvn test
+**Lancer uniquement une classe de tests** :
+
+mvn -Dtest=CourseServiceTest test
