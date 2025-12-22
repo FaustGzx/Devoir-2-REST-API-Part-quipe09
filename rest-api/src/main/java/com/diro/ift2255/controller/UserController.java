@@ -1,3 +1,4 @@
+// src/main/java/com/diro/ift2255/controller/UserController.java
 package com.diro.ift2255.controller;
 
 import java.util.List;
@@ -10,70 +11,72 @@ import com.diro.ift2255.util.ValidationUtil;
 
 import io.javalin.http.Context;
 
-
 public class UserController {
-    // Service qui contient la logique métier pour la manipulation des utilisateurs (users) et la communication avec les services externes
+
     private final UserService service;
-    
+
     public UserController(UserService service) {
         this.service = service;
     }
 
-    /**
-     * Récupère la liste de tous les utilisateurs.
-     * @param ctx Contexte Javalin représentant la requête et la réponse HTTP
-     */
-    public void getAllUsers(Context ctx) {
-        List<User> users = service.getAllUsers();
-        ctx.json(users);
+    private Integer parseIdOrBadRequest(Context ctx) {
+        try {
+            return Integer.parseInt(ctx.pathParam("id"));
+        } catch (NumberFormatException e) {
+            ctx.status(400).json(ResponseUtil.error("Paramètre id invalide (doit être un entier)."));
+            return null;
+        }
     }
 
-    /**
-     * Récupère un utilisateur spécifique par son ID.
-     * @param ctx Contexte Javalin représentant la requête et la réponse HTTP
-     */
+    public void getAllUsers(Context ctx) {
+        List<User> users = service.getAllUsers();
+        ctx.json(ResponseUtil.ok(users));
+    }
+
     public void getUserById(Context ctx) {
-        int id = Integer.parseInt(ctx.pathParam("id"));
+        Integer id = parseIdOrBadRequest(ctx);
+        if (id == null) return;
 
         Optional<User> user = service.getUserById(id);
         if (user.isPresent()) {
-            ctx.json(user.get());
+            ctx.json(ResponseUtil.ok(user.get()));
         } else {
-            ctx.status(404).json(ResponseUtil.formatError("Aucun utilisateur ne correspond à l'ID: " + id));
+            ctx.status(404).json(ResponseUtil.error("Aucun utilisateur ne correspond à l'ID: " + id));
         }
     }
 
-    /**
-     * Crée un nouvel utilisateur avec les données passées dans le body.
-     * @param ctx Contexte Javalin représentant la requête et la réponse HTTP
-     */
     public void createUser(Context ctx) {
         User user = ctx.bodyAsClass(User.class);
-        if (!ValidationUtil.isEmail(user.getEmail())) {
-            ctx.status(400).json("Invalid email format");
+        if (user == null || user.getEmail() == null || !ValidationUtil.isEmail(user.getEmail())) {
+            ctx.status(400).json(ResponseUtil.error("Format d'email invalide."));
             return;
         }
         service.createUser(user);
-        ctx.status(201).json(user);
+        ctx.status(201).json(ResponseUtil.ok(user));
     }
 
-    /**
-     * Met à jour un utilisateur existant avec les données passées dans le body.
-     * @param ctx Contexte Javalin représentant la requête et la réponse HTTP
-     */
     public void updateUser(Context ctx) {
-        int id = Integer.parseInt(ctx.pathParam("id"));
+        Integer id = parseIdOrBadRequest(ctx);
+        if (id == null) return;
+
         User updated = ctx.bodyAsClass(User.class);
+        if (updated == null) {
+            ctx.status(400).json(ResponseUtil.error("Body invalide."));
+            return;
+        }
+        if (updated.getEmail() != null && !ValidationUtil.isEmail(updated.getEmail())) {
+            ctx.status(400).json(ResponseUtil.error("Format d'email invalide."));
+            return;
+        }
+
         service.updateUser(id, updated);
-        ctx.json(updated);
+        ctx.json(ResponseUtil.ok(updated));
     }
 
-    /**
-     * Supprime un utilisateur existant.
-     * @param ctx Contexte Javalin représentant la requête et la réponse HTTP
-     */
     public void deleteUser(Context ctx) {
-        int id = Integer.parseInt(ctx.pathParam("id"));
+        Integer id = parseIdOrBadRequest(ctx);
+        if (id == null) return;
+
         service.deleteUser(id);
         ctx.status(204);
     }

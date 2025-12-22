@@ -45,7 +45,7 @@ public class CourseService {
 
         try {
             Course course = clientApi.get(uri, Course.class);
-            return (course == null) ? Optional.empty() : Optional.of(course);
+            return Optional.ofNullable(course);
         } catch (RuntimeException e) {
             return Optional.empty();
         }
@@ -79,6 +79,10 @@ public class CourseService {
     // Vérification d’éligibilité
     // ------------------------------
     public EligibilityResult checkEligibility(String courseId, List<String> completedCoursesIds) {
+        return checkEligibility(courseId, completedCoursesIds, null);
+    }
+
+    public EligibilityResult checkEligibility(String courseId, List<String> completedCoursesIds, Integer cycle) {
         Optional<Course> opt = getCourseById(courseId);
         if (opt.isEmpty()) {
             return new EligibilityResult(false, List.of());
@@ -91,26 +95,26 @@ public class CourseService {
             return new EligibilityResult(true, List.of());
         }
 
-        List<String> completed = (completedCoursesIds == null) ? List.of() : completedCoursesIds;
-
+        // Normaliser en majuscules pour éviter les problèmes de casse
         Set<String> done = new HashSet<>();
-        for (String c : completed) {
+        for (String c : (completedCoursesIds == null ? List.<String>of() : completedCoursesIds)) {
             if (c != null && !c.isBlank()) {
-                done.add(c.trim());
+                done.add(c.trim().toUpperCase());
             }
         }
 
         List<String> missing = new ArrayList<>();
         for (String p : prereqs) {
             if (p != null && !p.isBlank()) {
-                String normalized = p.trim();
+                String normalized = p.trim().toUpperCase();
                 if (!done.contains(normalized)) {
-                    missing.add(normalized);
+                    missing.add(p.trim());
                 }
             }
         }
 
-        boolean eligible = missing.isEmpty();
-        return new EligibilityResult(eligible, missing);
+        // TODO: appliquer une logique de cycle quand vous aurez une règle/donnée fiable (1,2,3).
+        // Pour l’instant, on ne bloque pas si cycle est fourni.
+        return new EligibilityResult(missing.isEmpty(), missing);
     }
 }

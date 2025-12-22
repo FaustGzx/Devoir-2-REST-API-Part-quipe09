@@ -1,3 +1,4 @@
+// src/main/java/com/diro/ift2255/model/EligibilityResult.java
 package com.diro.ift2255.model;
 
 import java.util.List;
