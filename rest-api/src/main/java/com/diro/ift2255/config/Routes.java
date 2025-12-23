@@ -84,6 +84,7 @@ public class Routes {
     // -----------------------------
     private static void registerReviewRoutes(Javalin app, ReviewController reviewController) {
         app.get("/avis/{courseId}", reviewController::getReviews);
+        app.get("/avis/{courseId}/aggregate", reviewController::getAggregate);
         app.post("/avis", reviewController::createReview);
     }
 

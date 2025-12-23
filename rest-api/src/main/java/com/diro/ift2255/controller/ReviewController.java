@@ -15,14 +15,24 @@ public class ReviewController {
         this.service = service;
     }
 
-    // GET /avis/{courseId}
+    // GET /avis/{courseId} - Retourne les avis individuels
     public void getReviews(Context ctx) {
         String courseId = ctx.pathParam("courseId");
         if (courseId == null || !courseId.trim().toUpperCase().matches("^[A-Z]{3}\\d{4}$")) {
             ctx.status(400).json(ResponseUtil.error("courseId invalide (ex: IFT2255)."));
             return;
         }
-        ctx.json(ResponseUtil.ok(service.getAggregateForCourse(courseId)));
+        ctx.json(ResponseUtil.ok(service.getReviewsForCourse(courseId.toUpperCase())));
+    }
+
+    // GET /avis/{courseId}/aggregate - Retourne l'agrégat (moyennes)
+    public void getAggregate(Context ctx) {
+        String courseId = ctx.pathParam("courseId");
+        if (courseId == null || !courseId.trim().toUpperCase().matches("^[A-Z]{3}\\d{4}$")) {
+            ctx.status(400).json(ResponseUtil.error("courseId invalide (ex: IFT2255)."));
+            return;
+        }
+        ctx.json(ResponseUtil.ok(service.getAggregateForCourse(courseId.toUpperCase())));
     }
 
     // POST /avis
