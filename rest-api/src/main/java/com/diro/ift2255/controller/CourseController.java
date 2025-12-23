@@ -5,6 +5,7 @@ import com.diro.ift2255.model.EligibilityResult;
 import com.diro.ift2255.service.AcademicResultService;
 import com.diro.ift2255.service.CompareService;
 import com.diro.ift2255.service.CourseService;
+import com.diro.ift2255.service.ProgramService;
 import com.diro.ift2255.util.ResponseUtil;
 import io.javalin.http.Context;
 
@@ -15,13 +16,16 @@ public class CourseController {
     private final CourseService service;
     private final AcademicResultService resultsService;
     private final CompareService compareService;
+    private final ProgramService programService;
 
     public CourseController(CourseService service,
                             AcademicResultService resultsService,
-                            CompareService compareService) {
+                            CompareService compareService,
+                            ProgramService programService) {
         this.service = service;
         this.resultsService = resultsService;
         this.compareService = compareService;
+        this.programService = programService;
     }
 
     // Validation type: IFT2255 (3 lettres + 4 chiffres)
@@ -39,6 +43,60 @@ public class CourseController {
     public void getAllCourses(Context ctx) {
         Map<String, String> queryParams = extractQueryParams(ctx);
         List<Course> courses = service.getAllCourses(queryParams);
+        ctx.json(ResponseUtil.ok(courses));
+    }
+
+    /**
+     * cours offerts pour un trimestre donné (global)
+     * ex:
+     *  GET /courses/offered?semester=H25
+     *  GET /courses/offered?semester=H25&programId=117510
+     *  GET /courses/offered?semester=H25&limit=50
+     */
+    public void getCoursesOfferedBySemester(Context ctx) {
+        String semester = ctx.queryParam("semester");
+
+        // Validation du trimestre 
+        if (semester == null || semester.isBlank()) {
+            ctx.status(400).json(ResponseUtil.error("Le paramètre 'semester' est requis (ex: H25, A24, E24)."));
+            return;
+        }
+
+        String semNormalized = semester.trim().toUpperCase();
+        if (!semNormalized.matches("^[HAE]\\d{2}$")) {
+            ctx.status(400).json(ResponseUtil.error("Format de trimestre invalide. Utilisez H25, A24, E24, etc."));
+            return;
+        }
+
+        // Paramètre optionnel: programId
+        String programId = ctx.queryParam("programId");
+
+        // Paramètre optionnel: limit
+        int limit = 100;
+        String limitParam = ctx.queryParam("limit");
+        if (limitParam != null && !limitParam.isBlank()) {
+            try {
+                limit = Integer.parseInt(limitParam.trim());
+                if (limit < 1 || limit > 500) {
+                    ctx.status(400).json(ResponseUtil.error("Le paramètre 'limit' doit être entre 1 et 500."));
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                ctx.status(400).json(ResponseUtil.error("Le paramètre 'limit' doit être un entier."));
+                return;
+            }
+        }
+
+        List<Course> courses;
+
+        if (programId != null && !programId.isBlank()) {
+            // Filtrer par programme
+            courses = programService.getProgramCoursesOfferedInSemester(programId.trim(), semNormalized, limit);
+        } else {
+            // Recherche globale via Planifium avec schedule
+            courses = service.getCoursesOfferedBySemester(semNormalized, limit);
+        }
+
         ctx.json(ResponseUtil.ok(courses));
     }
 
@@ -149,8 +207,14 @@ public class CourseController {
         if (cycleParam != null && !cycleParam.isBlank()) {
             try {
                 cycle = Integer.parseInt(cycleParam.trim());
+                if (cycle < 1 || cycle > 3) {
+                    ctx.status(400).json(ResponseUtil.error(
+                            "Le paramètre cycle doit être 1 (baccalauréat), 2 (maîtrise) ou 3 (doctorat)."));
+                    return;
+                }
             } catch (NumberFormatException e) {
-                ctx.status(400).json(ResponseUtil.error("Le paramètre cycle doit être un entier (1, 2 ou 3)."));
+                ctx.status(400).json(ResponseUtil.error(
+                        "Le paramètre cycle doit être un entier: 1 (baccalauréat), 2 (maîtrise) ou 3 (doctorat)."));
                 return;
             }
         }

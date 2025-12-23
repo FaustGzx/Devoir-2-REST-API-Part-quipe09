@@ -151,4 +151,45 @@ private Integer inferRequiredCycle(String courseId) {
             .toList();
 }
 
+    /**
+     * Récupère les cours offerts pour un trimestre donné (global, sans filtre de programme).
+     * Utilise une liste de sigles courants du DIRO pour interroger Planifium.
+     */
+    public List<Course> getCoursesOfferedBySemester(String semester, int limit) {
+        if (semester == null || semester.isBlank()) return List.of();
+
+        String sem = semester.trim().toLowerCase();
+
+        // Liste de sigles courants du DIRO 
+        List<String> commonSigles = List.of(
+                "IFT1015", "IFT1025", "IFT1065", "IFT1215", "IFT1227",
+                "IFT2015", "IFT2035", "IFT2105", "IFT2125", "IFT2255", "IFT2505", "IFT2905",
+                "IFT3150", "IFT3205", "IFT3225", "IFT3245", "IFT3275", "IFT3295", "IFT3325", "IFT3355", "IFT3395", "IFT3700", "IFT3710",
+                "IFT6135", "IFT6390", "IFT6561", "IFT6758", "IFT6760"
+        );
+
+        Map<String, String> qp = new HashMap<>();
+        qp.put("include_schedule", "true");
+        qp.put("schedule_semester", sem);
+
+        List<Course> offered = new ArrayList<>();
+        int count = 0;
+
+        for (String sigle : commonSigles) {
+            if (count >= limit) break;
+
+            Optional<Course> opt = getCourseById(sigle, qp);
+            if (opt.isPresent()) {
+                Course course = opt.get();
+                // Vérifier que le cours a bien un horaire pour ce trimestre
+                if (course.getSchedules() != null && !course.getSchedules().isEmpty()) {
+                    offered.add(course);
+                    count++;
+                }
+            }
+        }
+
+        return offered;
+    }
+
 }

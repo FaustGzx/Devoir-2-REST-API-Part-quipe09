@@ -27,7 +27,8 @@ public class Routes {
         UserService userService = new UserService();
         UserController userController = new UserController(userService);
 
-        CourseController courseController = new CourseController(courseService, academicResultService, compareService);
+        // CourseController reçoit aussi ProgramService pour /courses/offered
+        CourseController courseController = new CourseController(courseService, academicResultService, compareService, programService);
 
         ReviewController reviewController = new ReviewController(reviewService);
 
@@ -55,6 +56,9 @@ public class Routes {
     // -----------------------------
     private static void registerCourseRoutes(Javalin app, CourseController courseController) {
         app.get("/courses", courseController::getAllCourses);
+
+        // cours offerts pour un trimestre donné (global, optionnel programId)
+        app.get("/courses/offered", courseController::getCoursesOfferedBySemester);
 
         // comparaison "simple" (ancienne) : renvoie juste les cours Planifium
         app.get("/courses/comparer", courseController::compareCourses);
