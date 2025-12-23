@@ -138,18 +138,49 @@ private Integer inferRequiredCycle(String courseId) {
 }
 
     public List<Course> searchBySiglePrefix(String prefix, Map<String, String> queryParams) {
-    // Stratégie: utiliser la recherche Planifium "name/description" n'aide pas.
-    // On prend une liste de cours "reg" via un endpoint déjà filtré si vous avez une source locale,
-    // sinon on fait une requête Planifium en récupérant une liste raisonnable et on filtre.
-    // Version minimale: réutiliser getAllCourses + filtrer côté serveur.
+        // SAFE: On utilise une liste locale de sigles connus par préfixe
+        // pour éviter d'appeler Planifium "GET all courses" (très lourd)
+        
+        if (prefix == null || prefix.isBlank()) return List.of();
+        String normalizedPrefix = prefix.trim().toUpperCase();
 
-    List<Course> all = getAllCourses(queryParams);
-    if (all == null) return List.of();
+        // Liste de sigles connus par département (extensible)
+        Map<String, List<String>> siglesByPrefix = Map.of(
+            "IFT", List.of(
+                "IFT1005", "IFT1015", "IFT1016", "IFT1025", "IFT1065", "IFT1215", "IFT1227",
+                "IFT2015", "IFT2035", "IFT2105", "IFT2125", "IFT2255", "IFT2505", "IFT2905",
+                "IFT3150", "IFT3205", "IFT3225", "IFT3245", "IFT3275", "IFT3295", "IFT3325", "IFT3355", "IFT3395", "IFT3700", "IFT3710",
+                "IFT6135", "IFT6232", "IFT6269", "IFT6390", "IFT6561", "IFT6758", "IFT6760"
+            ),
+            "MAT", List.of(
+                "MAT1000", "MAT1101", "MAT1400", "MAT1410", "MAT1600", "MAT1620", "MAT1720",
+                "MAT2050", "MAT2450", "MAT2717"
+            ),
+            "STT", List.of(
+                "STT1000", "STT1682", "STT1700", "STT2000", "STT2700"
+            ),
+            "PHY", List.of(
+                "PHY1234", "PHY1441", "PHY1620", "PHY1652"
+            )
+        );
 
-    return all.stream()
-            .filter(c -> c != null && c.getId() != null && c.getId().toUpperCase().startsWith(prefix))
-            .toList();
-}
+        // Récupérer la liste de sigles pour ce préfixe
+        List<String> sigles = siglesByPrefix.get(normalizedPrefix);
+        if (sigles == null || sigles.isEmpty()) {
+            // Préfixe inconnu: retourner liste vide plutôt que charger tous les cours
+            return List.of();
+        }
+
+        // Interroger Planifium pour ces sigles spécifiques (safe et rapide)
+        List<Course> result = new ArrayList<>();
+        Map<String, String> params = (queryParams == null) ? Collections.emptyMap() : queryParams;
+
+        for (String sigle : sigles) {
+            getCourseById(sigle, params).ifPresent(result::add);
+        }
+
+        return result;
+    }
 
     /**
      * Récupère les cours offerts pour un trimestre donné (global, sans filtre de programme).

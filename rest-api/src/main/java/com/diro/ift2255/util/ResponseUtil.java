@@ -1,6 +1,7 @@
 // src/main/java/com/diro/ift2255/util/ResponseUtil.java
 package com.diro.ift2255.util;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ResponseUtil {
@@ -10,6 +11,17 @@ public class ResponseUtil {
                 "success", true,
                 "data", data
         );
+    }
+
+    /**
+     * Réponse OK avec un message informatif (ex: pour liste vide)
+     */
+    public static Map<String, Object> ok(Object data, String message) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("success", true);
+        result.put("data", data);
+        result.put("message", message);
+        return result;
     }
 
     public static Map<String, Object> error(String message) {

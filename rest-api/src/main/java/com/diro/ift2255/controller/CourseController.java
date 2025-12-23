@@ -39,8 +39,33 @@ public class CourseController {
      *  GET /courses?name=logiciel
      *  GET /courses?description=java
      *  GET /courses?courses_sigle=ift1015,ift1025
+     *  GET /courses?sigle_prefix=IFT  (recherche par préfixe, ex: tous les IFT*)
      */
     public void getAllCourses(Context ctx) {
+        // Cas spécial: recherche par préfixe de sigle (ex: IFT → tous les IFT*)
+        String siglePrefix = ctx.queryParam("sigle_prefix");
+        if (siglePrefix != null && !siglePrefix.isBlank()) {
+            String prefix = siglePrefix.trim().toUpperCase();
+            if (!prefix.matches("^[A-Z]{2,3}$")) {
+                ctx.status(400).json(ResponseUtil.error(
+                        "Le préfixe de sigle doit contenir 2 ou 3 lettres (ex: IFT, MAT, PHY)."));
+                return;
+            }
+            Map<String, String> queryParams = extractQueryParams(ctx);
+            queryParams.remove("sigle_prefix"); // Ne pas envoyer à Planifium
+            List<Course> courses = service.searchBySiglePrefix(prefix, queryParams);
+            
+            // Message informatif si préfixe non supporté (liste vide)
+            if (courses.isEmpty()) {
+                ctx.json(ResponseUtil.ok(courses, 
+                    "Aucun cours trouvé pour le préfixe '" + prefix + "'. Préfixes supportés: IFT, MAT, STT, PHY."));
+                return;
+            }
+            ctx.json(ResponseUtil.ok(courses));
+            return;
+        }
+
+        // Cas normal: recherche Planifium (name, description, courses_sigle)
         Map<String, String> queryParams = extractQueryParams(ctx);
         List<Course> courses = service.getAllCourses(queryParams);
         ctx.json(ResponseUtil.ok(courses));
