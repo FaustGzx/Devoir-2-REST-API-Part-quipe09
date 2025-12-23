@@ -114,3 +114,23 @@ mvn test
 **Lancer uniquement une classe de tests** :
 
 mvn -Dtest=CourseServiceTest test
+
+
+
+##  Bot Discord – Avis étudiants
+
+Les avis étudiants sont collectés via un bot Discord minimal, conformément à l’énoncé.
+
+### Fonctionnalité
+- Collecte d’avis étudiants depuis un canal Discord dédié
+- Envoi des avis à l’API REST via l’endpoint `POST /avis`
+
+### Lien du serveur Discord de test
+https://discord.gg/YRGSyEAh
+
+### Canal utilisé
+- `#avis-cours`
+
+### Détails techniques
+- Implémenté en Python avec `discord.py`
+- Documentation complète disponible dans `discord-bot/README.md`

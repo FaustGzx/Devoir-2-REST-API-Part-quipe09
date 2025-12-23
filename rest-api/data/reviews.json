@@ -5,4 +5,130 @@
   "comment" : "CA VA",
   "author" : null,
   "timestamp" : 1766519296744
+}, {
+  "courseId" : "IFT2255",
+  "difficulty" : 4,
+  "workload" : 3,
+  "comment" : "Bon cours mais demandant",
+  "author" : "cmpspablo01",
+  "timestamp" : 1766528232646
+}, {
+  "courseId" : "IFT2235",
+  "difficulty" : 4,
+  "workload" : 3,
+  "comment" : "Bon cours mais demandant lol",
+  "author" : "cmpspablo01",
+  "timestamp" : 1766528272992
+}, {
+  "courseId" : "IFT1015",
+  "difficulty" : 3,
+  "workload" : 3,
+  "comment" : "Un bon cours pour des étudiants étudier le python",
+  "author" : "insta noudle",
+  "timestamp" : 1766528930498
+}, {
+  "courseId" : "IFT1015",
+  "difficulty" : 2,
+  "workload" : 2,
+  "comment" : "Bonne introduction à la programmation",
+  "author" : "insta noudle",
+  "timestamp" : 1766529331171
+}, {
+  "courseId" : "IFT1015",
+  "difficulty" : 1,
+  "workload" : 1,
+  "comment" : "Facile si on a déjà codé",
+  "author" : "insta noudle",
+  "timestamp" : 1766529345200
+}, {
+  "courseId" : "IFT2255",
+  "difficulty" : 4,
+  "workload" : 4,
+  "comment" : "Projet intéressant mais exigeant",
+  "author" : "insta noudle",
+  "timestamp" : 1766529409677
+}, {
+  "courseId" : "IFT1025",
+  "difficulty" : 3,
+  "workload" : 3,
+  "comment" : "Concepts OO bien expliqués",
+  "author" : "insta noudle",
+  "timestamp" : 1766529432586
+}, {
+  "courseId" : "IFT2015",
+  "difficulty" : 4,
+  "workload" : 4,
+  "comment" : "Structures de données avancées",
+  "author" : "insta noudle",
+  "timestamp" : 1766529446028
+}, {
+  "courseId" : "MAT1400",
+  "difficulty" : 5,
+  "workload" : 5,
+  "comment" : "Calcul très difficile",
+  "author" : "insta noudle",
+  "timestamp" : 1766529454046
+}, {
+  "courseId" : "IFT2255",
+  "difficulty" : 3,
+  "workload" : 3,
+  "comment" : "Bon équilibre théorie/pratique",
+  "author" : "insta noudle",
+  "timestamp" : 1766529483442
+}, {
+  "courseId" : "IFT1025",
+  "difficulty" : 4,
+  "workload" : 4,
+  "comment" : "Beaucoup de travaux pratiques",
+  "author" : "insta noudle",
+  "timestamp" : 1766529492551
+}, {
+  "courseId" : "MAT1400",
+  "difficulty" : 4,
+  "workload" : 4,
+  "comment" : "Beaucoup de travail hebdomadaire",
+  "author" : "insta noudle",
+  "timestamp" : 1766529507587
+}, {
+  "courseId" : "IFT2015",
+  "difficulty" : 3,
+  "workload" : 3,
+  "comment" : "Intéressant mais abstrait",
+  "author" : "insta noudle",
+  "timestamp" : 1766529515036
+}, {
+  "courseId" : "MAT1400",
+  "difficulty" : 3,
+  "workload" : 3,
+  "comment" : "Faisable avec effort",
+  "author" : "insta noudle",
+  "timestamp" : 1766529525333
+}, {
+  "courseId" : "IFT1025",
+  "difficulty" : 2,
+  "workload" : 3,
+  "comment" : "Correct sans plus",
+  "author" : "insta noudle",
+  "timestamp" : 1766529532312
+}, {
+  "courseId" : "IFT2015",
+  "difficulty" : 5,
+  "workload" : 4,
+  "comment" : "Difficile mais très utile",
+  "author" : "insta noudle",
+  "timestamp" : 1766529538639
+}, {
+  "courseId" : "IFT2255",
+  "difficulty" : 5,
+  "workload" : 5,
+  "comment" : "Très demandant mais formateur",
+  "author" : "insta noudle",
+  "timestamp" : 1766529548847
+}, {
+  "courseId" : "IFT1015",
+  "difficulty" : 3,
+  "workload" : 2,
+  "comment" : "Bien structuré",
+  "author" : "insta noudle",
+  "timestamp" : 1766529607485
 } ]
