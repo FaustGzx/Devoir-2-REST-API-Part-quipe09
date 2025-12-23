@@ -358,20 +358,32 @@ public class CliPrinter {
 
         printSubtitle("Résultats académiques");
 
-        if (results.has("average") && !results.get("average").isNull()) {
-            printField("Moyenne", String.format("%.2f", results.get("average").asDouble()));
+        // Afficher le cours (sigle + nom)
+        String sigle = results.path("sigle").asText("");
+        String nom = results.path("nom").asText("");
+        if (!sigle.isEmpty()) {
+            printField("Cours", sigle + (!nom.isEmpty() ? " - " + nom : ""));
         }
-        if (results.has("median") && !results.get("median").isNull()) {
-            printField("Médiane", String.format("%.2f", results.get("median").asDouble()));
+
+        // Moyenne (cote lettre: A+, A, B+, etc.)
+        String moyenne = results.path("moyenne").asText("");
+        if (!moyenne.isEmpty()) {
+            printField("Moyenne", moyenne);
         }
-        if (results.has("ecartType") && !results.get("ecartType").isNull()) {
-            printField("Écart-type", String.format("%.2f", results.get("ecartType").asDouble()));
+
+        // Score (indicateur de réussite 1-5)
+        if (results.has("score") && !results.get("score").isNull()) {
+            printField("Score", String.format("%.2f / 5", results.get("score").asDouble()));
         }
+
+        // Nombre de participants
         if (results.has("participants") && !results.get("participants").isNull()) {
             printField("Participants", results.get("participants").asInt());
         }
-        if (results.has("passingRate") && !results.get("passingRate").isNull()) {
-            printField("Taux de réussite", String.format("%.1f%%", results.get("passingRate").asDouble() * 100));
+
+        // Nombre de trimestres offerts
+        if (results.has("trimestres") && !results.get("trimestres").isNull()) {
+            printField("Trimestres offerts", results.get("trimestres").asInt());
         }
     }
 
