@@ -94,5 +94,6 @@ public class Routes {
         app.post("/sets", courseSetController::createSet);
         app.get("/sets/{id}", courseSetController::getSet);
         app.get("/sets/{id}/schedule", courseSetController::getSetSchedule);
+        app.get("/sets/{id}/conflicts", courseSetController::getSetConflicts); // BONUS: Détection conflits
     }
 }

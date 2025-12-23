@@ -78,7 +78,8 @@ public class CourseSetController {
                 }
             }
 
-            var opt = service.createSet(body.getSemester(), body.getCourseIds());
+            // FIX: utiliser les valeurs nettoyées (cleanedIds, semNormalized)
+            var opt = service.createSet(semNormalized, cleanedIds);
             if (opt.isEmpty()) {
                 ctx.status(400).json(ResponseUtil.error(
                         "Impossible de créer l'ensemble. Vérifiez les paramètres."));
@@ -124,5 +125,29 @@ public class CourseSetController {
             return;
         }
         ctx.json(ResponseUtil.ok(service.getSetSchedule(id)));
+    }
+
+    // GET /sets/{id}/conflicts - BONUS: Détection des conflits d'horaire
+    public void getSetConflicts(Context ctx) {
+        String id = ctx.pathParam("id");
+        
+        if (id == null || id.isBlank()) {
+            ctx.status(400).json(ResponseUtil.error("L'identifiant de l'ensemble est requis."));
+            return;
+        }
+
+        var opt = service.getSet(id);
+        if (opt.isEmpty()) {
+            ctx.status(404).json(ResponseUtil.error("Ensemble introuvable: " + id));
+            return;
+        }
+
+        var conflicts = service.detectConflicts(id);
+        
+        if (conflicts.isEmpty()) {
+            ctx.json(ResponseUtil.ok(conflicts, "Aucun conflit d'horaire détecté."));
+        } else {
+            ctx.json(ResponseUtil.ok(conflicts, conflicts.size() + " conflit(s) d'horaire détecté(s)."));
+        }
     }
 }
