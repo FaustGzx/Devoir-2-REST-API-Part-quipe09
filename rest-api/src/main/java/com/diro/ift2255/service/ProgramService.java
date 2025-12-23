@@ -126,7 +126,7 @@ public class ProgramService {
         qp.put("include_schedule", "true");
 
         // IMPORTANT: garder la casse (H25) (ne pas lowerCase)
-        qp.put("schedule_semester", sem);
+        qp.put("schedule_semester", sem.toLowerCase());
 
         for (String id : ids) {
             courseService.getCourseById(id, qp).ifPresent(course -> {

@@ -8,17 +8,41 @@ import io.javalin.Javalin;
 public class Routes {
 
     public static void register(Javalin app) {
-        registerUserRoutes(app);
-        registerCourseRoutes(app);
-        registerProgramRoutes(app);
-        registerReviewRoutes(app);
-        registerCourseSetRoutes(app);
-    }
+        // Instancier les dépendances partagées 1 seule fois
+        HttpClientApi api = new HttpClientApi();
 
-    private static void registerUserRoutes(Javalin app) {
+        // Services communs
+        CourseService courseService = new CourseService(api);
+        AcademicResultService academicResultService = new AcademicResultService("historique_cours_prog_117510.csv");
+        ReviewService reviewService = new ReviewService("data/reviews.json");
+        CompareService compareService = new CompareService(courseService, reviewService, academicResultService);
+
+
+        ProgramService programService = new ProgramService(api, courseService);
+        ProgramController programController = new ProgramController(programService);
+
+        CourseSetService courseSetService = new CourseSetService(courseService);
+        CourseSetController courseSetController = new CourseSetController(courseSetService);
+
         UserService userService = new UserService();
         UserController userController = new UserController(userService);
 
+        CourseController courseController = new CourseController(courseService, academicResultService, compareService);
+
+        ReviewController reviewController = new ReviewController(reviewService);
+
+        // Enregistrer les routes
+        registerUserRoutes(app, userController);
+        registerCourseRoutes(app, courseController);
+        registerProgramRoutes(app, programController);
+        registerReviewRoutes(app, reviewController);
+        registerCourseSetRoutes(app, courseSetController);
+    }
+
+    // -----------------------------
+    // USERS
+    // -----------------------------
+    private static void registerUserRoutes(Javalin app, UserController userController) {
         app.get("/users", userController::getAllUsers);
         app.get("/users/{id}", userController::getUserById);
         app.post("/users", userController::createUser);
@@ -26,43 +50,45 @@ public class Routes {
         app.delete("/users/{id}", userController::deleteUser);
     }
 
-    private static void registerCourseRoutes(Javalin app) {
-        CourseService courseService = new CourseService(new HttpClientApi());
-        CourseController courseController = new CourseController(courseService);
-
+    // -----------------------------
+    // COURSES
+    // -----------------------------
+    private static void registerCourseRoutes(Javalin app, CourseController courseController) {
         app.get("/courses", courseController::getAllCourses);
+
+        // comparaison "simple" (ancienne) : renvoie juste les cours Planifium
         app.get("/courses/comparer", courseController::compareCourses);
+
+        // NEW : comparaison "réelle" : Planifium + Avis + CSV
+        app.get("/courses/compare-full", courseController::compareCoursesFull);
+
         app.get("/courses/{id}/results", courseController::getAcademicResults);
         app.get("/courses/{id}/eligibility", courseController::getEligibility);
         app.get("/courses/{id}", courseController::getCourseById);
     }
 
-    private static void registerProgramRoutes(Javalin app) {
-        HttpClientApi api = new HttpClientApi();
-        CourseService courseService = new CourseService(api);
-        ProgramService programService = new ProgramService(api, courseService);
-        ProgramController programController = new ProgramController(programService);
-
+    // -----------------------------
+    // PROGRAMS
+    // -----------------------------
+    private static void registerProgramRoutes(Javalin app, ProgramController programController) {
         app.get("/programs/{id}", programController::getProgram);
         app.get("/programs/{id}/courses", programController::getProgramCoursesOfferedInSemester);
     }
 
-    private static void registerReviewRoutes(Javalin app) {
-        // Stockage local: crée un dossier "data" à la racine du projet
-        ReviewService reviewService = new ReviewService("data/reviews.json");
-        ReviewController reviewController = new ReviewController(reviewService);
-
+    // -----------------------------
+    // REVIEWS
+    // -----------------------------
+    private static void registerReviewRoutes(Javalin app, ReviewController reviewController) {
         app.get("/avis/{courseId}", reviewController::getReviews);
         app.post("/avis", reviewController::createReview);
     }
 
-    private static void registerCourseSetRoutes(Javalin app) {
-        CourseService courseService = new CourseService(new HttpClientApi());
-        CourseSetService setService = new CourseSetService(courseService);
-        CourseSetController setController = new CourseSetController(setService);
-
-        app.post("/sets", setController::createSet);
-        app.get("/sets/{id}", setController::getSet);
-        app.get("/sets/{id}/schedule", setController::getSetSchedule);
+    // -----------------------------
+    // SETS
+    // -----------------------------
+    private static void registerCourseSetRoutes(Javalin app, CourseSetController courseSetController) {
+        app.post("/sets", courseSetController::createSet);
+        app.get("/sets/{id}", courseSetController::getSet);
+        app.get("/sets/{id}/schedule", courseSetController::getSetSchedule);
     }
 }

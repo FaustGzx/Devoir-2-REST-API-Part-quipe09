@@ -41,7 +41,8 @@ public class CourseService {
         Map<String, String> params = (queryParams == null) ? Collections.emptyMap() : queryParams;
 
         String cleanedId = courseId.trim();
-        URI uri = HttpClientApi.buildUri(BASE_URL + "/" + cleanedId, params);
+        URI uri = HttpClientApi.buildUri(BASE_URL + "/" + cleanedId.toLowerCase(), params);
+
 
         try {
             Course course = clientApi.get(uri, Course.class);
@@ -83,38 +84,71 @@ public class CourseService {
     }
 
     public EligibilityResult checkEligibility(String courseId, List<String> completedCoursesIds, Integer cycle) {
-        Optional<Course> opt = getCourseById(courseId);
-        if (opt.isEmpty()) {
-            return new EligibilityResult(false, List.of());
-        }
+    Optional<Course> opt = getCourseById(courseId);
+    if (opt.isEmpty()) {
+        return new EligibilityResult(false, List.of(), false, null);
+    }
 
-        Course course = opt.get();
-        List<String> prereqs = course.getPrerequisiteCourses();
+    // 1) Prérequis
+    Course course = opt.get();
+    List<String> prereqs = course.getPrerequisiteCourses();
 
-        if (prereqs == null || prereqs.isEmpty()) {
-            return new EligibilityResult(true, List.of());
-        }
+    Set<String> done = new HashSet<>();
+    for (String c : (completedCoursesIds == null ? List.<String>of() : completedCoursesIds)) {
+        if (c != null && !c.isBlank()) done.add(c.trim().toUpperCase());
+    }
 
-        // Normaliser en majuscules pour éviter les problèmes de casse
-        Set<String> done = new HashSet<>();
-        for (String c : (completedCoursesIds == null ? List.<String>of() : completedCoursesIds)) {
-            if (c != null && !c.isBlank()) {
-                done.add(c.trim().toUpperCase());
-            }
-        }
-
-        List<String> missing = new ArrayList<>();
+    List<String> missing = new ArrayList<>();
+    if (prereqs != null) {
         for (String p : prereqs) {
             if (p != null && !p.isBlank()) {
                 String normalized = p.trim().toUpperCase();
-                if (!done.contains(normalized)) {
-                    missing.add(p.trim());
-                }
+                if (!done.contains(normalized)) missing.add(normalized);
             }
         }
-
-        // TODO: appliquer une logique de cycle quand vous aurez une règle/donnée fiable (1,2,3).
-        // Pour l’instant, on ne bloque pas si cycle est fourni.
-        return new EligibilityResult(missing.isEmpty(), missing);
     }
+
+    boolean prereqOk = missing.isEmpty();
+
+    // 2) Cycle (règle minimale)
+    Integer required = inferRequiredCycle(courseId);
+    boolean cycleOk = true;
+
+    if (cycle != null) {
+        if (cycle < 1 || cycle > 3) {
+            // cycle invalide -> on refuse
+            return new EligibilityResult(false, missing, false, required);
+        }
+        cycleOk = (required == null) || (cycle >= required);
+    }
+
+    boolean eligible = prereqOk && cycleOk;
+    return new EligibilityResult(eligible, missing, cycleOk, required);
+}
+
+// Règle minimale: codes >= 6000 -> cycle 2/3 (ici on met 2)
+private Integer inferRequiredCycle(String courseId) {
+    if (courseId == null) return null;
+    String id = courseId.trim().toUpperCase();
+    if (!id.matches("^[A-Z]{3}\\d{4}$")) return null;
+
+    int num = Integer.parseInt(id.substring(3));
+    if (num >= 6000) return 2; // cycles supérieurs
+    return 1;                  // 1er cycle
+}
+
+    public List<Course> searchBySiglePrefix(String prefix, Map<String, String> queryParams) {
+    // Stratégie: utiliser la recherche Planifium "name/description" n'aide pas.
+    // On prend une liste de cours "reg" via un endpoint déjà filtré si vous avez une source locale,
+    // sinon on fait une requête Planifium en récupérant une liste raisonnable et on filtre.
+    // Version minimale: réutiliser getAllCourses + filtrer côté serveur.
+
+    List<Course> all = getAllCourses(queryParams);
+    if (all == null) return List.of();
+
+    return all.stream()
+            .filter(c -> c != null && c.getId() != null && c.getId().toUpperCase().startsWith(prefix))
+            .toList();
+}
+
 }
