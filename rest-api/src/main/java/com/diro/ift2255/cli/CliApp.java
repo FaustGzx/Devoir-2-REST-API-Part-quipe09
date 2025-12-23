@@ -207,13 +207,10 @@ public class CliApp {
         String semester = menu.askForSemester(null);
         if (semester == null) return;
 
-        String programId = menu.askForInput("ID du programme (optionnel, Entrée pour ignorer) : ");
-
         Map<String, String> params = new HashMap<>();
         params.put("semester", semester);
-        if (!programId.isEmpty()) {
-            params.put("programId", programId);
-        }
+
+        CliPrinter.printInfo("Recherche des cours offerts en " + semester + "...");
 
         ApiClient.ApiResponse response = apiClient.get("/courses/offered", params);
 
