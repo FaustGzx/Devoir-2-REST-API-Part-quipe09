@@ -6,6 +6,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+/**
+ * Représente un programme académique de l’Université de Montréal.
+ *
+ * <p>Un {@code Program} contient les informations générales d’un programme
+ * (identifiant, nom, description) ainsi que la liste des cours qui le composent.</p>
+ */
 public class Program {
 
     @JsonProperty("id")
@@ -17,7 +23,11 @@ public class Program {
     // certains endpoints peuvent renvoyer "courses" ou "program_courses"
     @JsonProperty("courses")
     private List<ProgramCourse> courses;
-
+    /**
+    * Construit un {@code Program} vide.
+    *
+    * <p>Utilisé pour la sérialisation/désérialisation JSON.</p>
+    */
     public Program() {}
 
     public String getId() { return id; }

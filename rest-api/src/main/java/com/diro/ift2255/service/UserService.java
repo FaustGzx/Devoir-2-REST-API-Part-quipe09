@@ -3,6 +3,12 @@ package com.diro.ift2255.service;
 
 import com.diro.ift2255.model.User;
 import java.util.*;
+/**
+ * Service responsable de la gestion des utilisateurs.
+ *
+ * <p>Ce service permet de créer, stocker et récupérer
+ * des informations relatives aux utilisateurs de l’application.</p>
+ */
 
 public class UserService {
     private final Map<Integer, User> users = new HashMap<>();

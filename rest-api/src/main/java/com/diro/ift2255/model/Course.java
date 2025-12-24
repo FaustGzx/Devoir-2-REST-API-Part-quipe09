@@ -8,6 +8,16 @@ import java.util.List;
 import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+/**
+ * Représente un cours universitaire du catalogue officiel.
+ *
+ * <p>Un {@code Course} contient les informations générales d’un cours
+ * (sigle, titre, crédits, description, préalables, etc.)
+ * ainsi que ses horaires par trimestre.</p>
+ *
+ * <p>Les structures internes {@link Course.Schedule} et
+ * {@link Course.Section} sont utilisées pour représenter l’horaire détaillé.</p>
+ */
 public class Course {
 
     private String id;
@@ -29,9 +39,18 @@ public class Course {
     private Map<String, Boolean> availablePeriods;
 
     private List<Schedule> schedules;
-
+    /**
+    * Construit un {@code Course} vide.
+    *
+    * <p>Utilisé pour la désérialisation JSON.</p>
+    */
     public Course() {}
-
+    /**
+    * Construit un cours avec ses informations principales.
+    *
+    * @param name nom du cours
+    * @param description description du cours
+    */
     public Course(String id, String name, String description) {
         this.id = id;
         this.name = name;
@@ -66,6 +85,12 @@ public class Course {
     public void setSchedules(List<Schedule> schedules) { this.schedules = schedules; }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
+    /**
+    * Représente l’horaire d’un cours pour un trimestre donné.
+    *
+    * <p>Un horaire regroupe plusieurs sections
+    * (cours magistraux, TP, laboratoires, etc.).</p>
+    */
     public static class Schedule {
 
         @JsonProperty("fetch_date")
@@ -87,6 +112,10 @@ public class Course {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
+    /**
+    * Représente une section d’activité d’un cours
+    * (cours magistral, laboratoire, travaux pratiques, etc.).
+    */
     public static class Section {
 
         private String name;

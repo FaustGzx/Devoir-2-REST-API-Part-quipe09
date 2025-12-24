@@ -11,13 +11,40 @@ import io.javalin.http.Context;
 
 import java.util.*;
 
+/**
+ * Contrôleur REST (Javalin) responsable des opérations liées aux cours.
+ *
+ * <p>Expose notamment :</p>
+ * <ul>
+ *   <li>la recherche de cours (sigle partiel, mots-clés dans titre/description)</li>
+ *   <li>les cours offerts pour un trimestre (avec option de filtrage par programme)</li>
+ *   <li>les détails d’un cours et son horaire</li>
+ *   <li>la vérification d’éligibilité (préalables + cycle)</li>
+ *   <li>les résultats académiques agrégés (CSV)</li>
+ *   <li>la comparaison de cours (avis + résultats + catalogue)</li>
+ * </ul>
+ *
+ * Les réponses JSON sont standardisées via {@link com.diro.ift2255.util.ResponseUtil}.
+ */
+
 public class CourseController {
 
+    /** Service applicatif pour accéder au catalogue Planifium et effectuer la recherche de cours. */
     private final CourseService service;
+    /** Service d’accès aux statistiques académiques agrégées (provenant du CSV fourni). */
     private final AcademicResultService resultsService;
+    /** Service responsable de la comparaison de cours (avis + résultats + informations du catalogue). */
     private final CompareService compareService;
+    /** Service lié aux programmes (filtrage de cours d’un programme, cours offerts par trimestre, etc.). */
     private final ProgramService programService;
-
+    /**
+     * Construit un contrôleur de cours.
+     *
+     * @param service service des cours (catalogue/recherche)
+     * @param resultsService service des résultats académiques agrégés
+     * @param compareService service de comparaison de cours
+     * @param programService service de programmes (filtrage par programme)
+     */
     public CourseController(CourseService service,
                             AcademicResultService resultsService,
                             CompareService compareService,
@@ -40,6 +67,7 @@ public class CourseController {
      *  GET /courses?description=java
      *  GET /courses?courses_sigle=ift1015,ift1025
      *  GET /courses?sigle_prefix=IFT  (recherche par préfixe, ex: tous les IFT*)
+     * @param ctx contexte Javalin (requête/réponse)
      */
     public void getAllCourses(Context ctx) {
         // Cas spécial: recherche par préfixe de sigle (ex: IFT → tous les IFT*)
@@ -75,8 +103,9 @@ public class CourseController {
      * cours offerts pour un trimestre donné (global)
      * ex:
      *  GET /courses/offered?semester=H25
-     *  GET /courses/offered?semester=H25&programId=117510
-     *  GET /courses/offered?semester=H25&limit=50
+     *  GET /courses/offered?semester=H25&amp;programId=117510
+     *  GET /courses/offered?semester=H25&amp;limit=50
+     * @param ctx contexte Javalin (requête/réponse)
      */
     public void getCoursesOfferedBySemester(Context ctx) {
         String semester = ctx.queryParam("semester");
@@ -129,7 +158,8 @@ public class CourseController {
      * CU2 - Détails d'un cours
      * Ex:
      *  GET /courses/IFT2255
-     *  GET /courses/IFT2255?include_schedule=true&schedule_semester=H25
+     *  GET /courses/IFT2255?include_schedule=true&amp;schedule_semester=H25
+     * @param ctx contexte Javalin (requête/réponse)
      */
     public void getCourseById(Context ctx) {
         String id = ctx.pathParam("id");
@@ -153,6 +183,7 @@ public class CourseController {
      * CU3 - Comparer des cours (ancienne version : renvoie juste les cours Planifium)
      * Ex:
      *  GET /courses/comparer?ids=ARC1102,IFT2255,IFT2015
+     * @param ctx contexte Javalin (requête/réponse)
      */
     public void compareCourses(Context ctx) {
         String idsParam = ctx.queryParam("ids");
@@ -184,6 +215,7 @@ public class CourseController {
      * NEW - Comparaison "réelle" : Planifium (nom) + Avis + CSV
      * Ex:
      *  GET /courses/compare-full?ids=IFT2255,IFT1025
+     * @param ctx contexte Javalin (requête/réponse)
      */
     public void compareCoursesFull(Context ctx) {
         String idsParam = ctx.queryParam("ids");
@@ -210,7 +242,8 @@ public class CourseController {
     /**
      * Vérifier l’éligibilité d’un étudiant à un cours selon les prérequis + cours complétés.
      * Ex:
-     *  GET /courses/IFT2255/eligibility?completed=IFT1015,IFT1025&cycle=1
+     *  GET /courses/IFT2255/eligibility?completed=IFT1015,IFT1025&amp;cycle=1
+     * @param ctx contexte Javalin (requête/réponse)
      */
     public void getEligibility(Context ctx) {
         String id = ctx.pathParam("id");
@@ -252,6 +285,7 @@ public class CourseController {
      * Résultats académiques agrégés (CSV)
      * Ex:
      *  GET /courses/IFT2255/results
+     * @param ctx contexte Javalin (requête/réponse)
      */
     public void getAcademicResults(Context ctx) {
         String id = ctx.pathParam("id");

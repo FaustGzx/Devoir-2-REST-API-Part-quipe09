@@ -1,5 +1,11 @@
 package com.diro.ift2255.model;
-
+/**
+ * Représente un élément de comparaison détaillée pour un cours.
+ *
+ * <p>Un {@code CourseComparisonItem} combine des informations provenant
+ * du catalogue de cours, des avis étudiants et des résultats académiques
+ * afin de faciliter la comparaison entre plusieurs cours.</p>
+ */
 public class CourseComparisonItem {
     private String courseId;
     private String name;

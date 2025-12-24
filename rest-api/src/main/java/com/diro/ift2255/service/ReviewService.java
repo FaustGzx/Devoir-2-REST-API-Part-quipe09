@@ -9,6 +9,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
+/**
+ * Service responsable de la gestion des avis étudiants.
+ *
+ * <p>Ce service permet de stocker, récupérer et agréger
+ * les avis soumis par les étudiants pour les cours,
+ * incluant la difficulté perçue et la charge de travail.</p>
+ */
 
 public class ReviewService {
 
