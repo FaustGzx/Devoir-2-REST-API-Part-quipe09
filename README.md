@@ -15,122 +15,314 @@ rest-api/
 │   │   │   │   └── Routes.java           # Définition des routes HTTP
 │   │   │   │
 │   │   │   ├── controller/
-│   │   │   │   ├── CourseController.java # Contrôleur pour les endpoints de cours
-│   │   │   │   └── UserController.java   # Contrôleur pour les endpoints utilisateurs
+│   │   │   │   ├── CourseController.java # Endpoints liés aux cours
+│   │   │   │   ├── UserController.java   # Endpoints utilisateurs
+│   │   │   │   ├── ReviewController.java # Avis étudiants
+│   │   │   │   ├── ProgramController.java # Programmes académiques
+│   │   │   │   └── CourseSetController.java # Ensembles de cours
 │   │   │   │
 │   │   │   ├── model/
-│   │   │   │   ├── Course.java           # Modèle représentant un cours
-│   │   │   │   └── User.java             # Modèle représentant un utilisateur
+│   │   │   │   ├── Course.java
+│   │   │   │   ├── User.java
+│   │   │   │   ├── Review.java
+│   │   │   │   ├── Program.java
+│   │   │   │   ├── CourseSet.java
+│   │   │   │   └── AcademicResult.java
 │   │   │   │
 │   │   │   ├── service/
-│   │   │   │   ├── CourseService.java    # Logique métier liée aux cours
-│   │   │   │   └── UserService.java      # Logique métier liée aux utilisateurs
+│   │   │   │   ├── CourseService.java
+│   │   │   │   ├── UserService.java
+│   │   │   │   ├── ReviewService.java
+│   │   │   │   ├── ProgramService.java
+│   │   │   │   ├── CourseSetService.java
+│   │   │   │   └── AcademicResultService.java
 │   │   │   │
 │   │   │   ├── util/
-│   │   │   │   ├── HttpClientAPI.java    # Client HTTP pour appels externes
-│   │   │   │   ├── HttpResponse.java     # Représentation d'une réponse HTTP
-│   │   │   │   ├── HttpStatus.java       # Codes de statut HTTP
-│   │   │   │   ├── ResponseUtil.java     # Outils pour formater les réponses
-│   │   │   │   └── ValidationUtil.java   # Méthodes utilitaires de validation
+│   │   │   │   ├── HttpClientAPI.java
+│   │   │   │   ├── HttpResponse.java
+│   │   │   │   ├── HttpStatus.java
+│   │   │   │   ├── ResponseUtil.java
+│   │   │   │   └── ValidationUtil.java
 │   │   │   │
-│   │   │   └── Main.java                 # Point d’entrée du serveur Javalin
+│   │   │   ├── cli/
+│   │   │   │   └── CliApp.java           # Point d'entrée du client CLI
+│   │   │   │
+│   │   │   └── Main.java                 # Point d'entrée du serveur Javalin
 │   │   │
-│   │   └── resources/                    # Ressources utilisées dans le code
+│   │   └── resources/                    # Ressources (CSV, config, etc.)
 │   │
-│   └── test/                             # Tests unitaires (JUnit)
+│   └── test/                             # Tests unitaires JUnit
+│
+├── discord-bot/                          # Bot Discord pour avis étudiants
+│   └── README.md
 │
 └── pom.xml
 ```
 
 ## Architecture
 
-Ce template suit principalement le modèle MVC :
+Le projet suit principalement le modèle MVC :
 
-- **Model (`model/`)** : Représentation des entités du domaine (ex. User, Course)
-- **Controller (`controller/`)** : Gestion des requêtes HTTP et appels au service
-- **Service (`service/`)** : Logique métier centrale
-- **Util (`util/`)** : Fonctions utilitaires réutilisables (validation, réponses, etc.)
-- **Config (`config/`)** : Configuration du serveur et définition des routes
-- **`Main.java`** : Point d’entrée du serveur (initialise Javalin et enregistre les routes)
+**Model (model/)**
 
-## Bonnes pratiques
+Représentation des entités du domaine (cours, utilisateurs, avis, ensembles).
 
-- Respectez la séparation des responsabilités entre **Controller**, **Service** et **Model**.
-- Utilisez les classes du dossier `util/` pour les validations et la gestion des réponses HTTP.
-- Centralisez les routes dans `config/Routes.java` pour simplifier l’ajout de nouveaux endpoints.
-- Ajoutez des **tests unitaires** pour chaque méthode de service.
-- Conservez un style de code uniforme (respect du standard Java).
+**Controller (controller/)**
 
+Gestion des requêtes HTTP et validation des entrées.
+
+**Service (service/)**
+
+Logique métier centrale (règles, agrégation, appels externes).
+
+**Util (util/)**
+
+Fonctions utilitaires partagées (validation, réponses HTTP, client REST).
+
+**Config (config/)**
+
+Centralisation des routes REST.
+
+**CLI (cli/)**
+
+Client en ligne de commande consommant l'API REST.
+
+**Main.java**
+
+Point d'entrée du serveur REST (initialisation de Javalin).
+
+## Bonnes pratiques appliquées
+
+- Séparation claire des responsabilités (Controller / Service / Model).
+- Centralisation des routes REST dans \`Routes.java\`.
+- Utilisation de services testables indépendamment de Javalin.
+- Tests unitaires JUnit pour les services.
+- Dépendances isolées via Maven.
+- Client CLI découplé du serveur REST.
 
 ## Prérequis
 
 - **Java 17**
 - **Maven 3.x**
 
-## Vérifier les installations :
+## Vérifier les installations
 
+```bash
 java -version
 mvn -v
+```
 
-## Installation:
+## Installation
 
-**Cloner le dépôt puis se placer dans le module** :
+**Cloner le dépôt et se placer dans le module REST**
 
-git clone <https://github.com/FaustGzx/ift2255-devoir2.git>
+```bash
+git clone https://github.com/FaustGzx/ift2255-devoir2.git
 cd ift2255-devoir2/rest-api
+```
 
-**Télécharger les dépendances** :
+**Construire le projet et générer les JARs**
 
-mvn clean compile
-## Exécution de l’application :
+```bash
+mvn -DskipTests package
+```
 
-1. **Lancer le serveur REST (Javalin)**
+Cela génère dans `target/` :
 
+- `ift2255-cli.jar` → fat-jar exécutable du client CLI
+- `rest-api-1.0-SNAPSHOT.jar` → JAR standard du serveur
+
+**Build complet recommandé (pour validation complète)**
+
+Pour exécuter les tests ET générer les JARs en une seule commande :
+
+```bash
+mvn clean test
+```
+
+Ou pour un build complet avec packaging :
+
+```bash
+mvn clean package
+```
+
+Pour un build rapide sans tests (développement) :
+
+```bash
+mvn -DskipTests clean package
+```
+
+## Exécution de l'application
+
+**IMPORTANT:** L'API et la CLI doivent être lancées dans deux terminaux distincts.
+
+### 1. Lancer le serveur REST (API Javalin)
+
+```bash
 cd ift2255-devoir2/rest-api
-mvn exec:java -Dexec.mainClass="com.diro.ift2255.Main"
-Serveur disponible à : http://localhost:7070
+mvn exec:java@server
+```
 
-2. **Lancer la CLI**
+Serveur disponible à : **http://localhost:7070**
 
+### 2. Lancer la CLI (méthode recommandée)
+
+Dans un second terminal :
+
+```bash
 cd ift2255-devoir2/rest-api
-mvn exec:java -Dexec.mainClass="com.diro.ift2255.cli.CliApp"
+java -jar target/ift2255-cli.jar
+```
 
-La CLI permet de :
+### 3. Lancer la CLI via Maven (optionnel)
 
-Rechercher des cours
+```bash
+cd ift2255-devoir2/rest-api
+mvn exec:java@cli
+```
 
-Consulter les détails
+### 4. Configurer l'URL de l'API (optionnel)
 
-Vérifier l’éligibilité
+Par défaut, la CLI utilise \`http://localhost:7070\`.
 
-Comparer des cours et estimer la charge totale
+**Via variable d'environnement**
+
+```bash
+API_BASE_URL=http://localhost:7070 java -jar target/ift2255-cli.jar
+```
+
+**Via Maven**
+
+```bash
+mvn exec:java@cli -Dexec.args="--baseUrl=http://localhost:7070"
+```
+
+## Fonctionnalités de la CLI
+
+La CLI permet notamment de :
+
+- Rechercher des cours
+- Consulter les détails d'un cours
+- Afficher les cours offerts par trimestre
+- Vérifier l'éligibilité à un cours
+- Consulter les résultats académiques
+- Comparer des cours et estimer la charge totale
+- Gérer des ensembles de cours
+- Consulter les avis étudiants
+
+## Endpoints de l'API REST
+
+Voici quelques endpoints principaux exposés par l'API :
+
+### Cours
+
+- `GET /courses` - Rechercher des cours (paramètres : `courses_sigle`, `sigle_prefix`, `name`, `description`)
+- `GET /courses/{sigle}` - Détails d'un cours
+- `GET /courses/offered?semester=A25` - Cours offerts pour un trimestre
+- `GET /courses/{sigle}/eligibility?cycle=1&completed=IFT1015` - Vérifier l'éligibilité
+- `GET /courses/{sigle}/results` - Résultats académiques d'un cours
+- `GET /courses/compare-full?ids=IFT2255,IFT2125` - Comparer des cours
+
+### Avis étudiants
+
+- `GET /avis/{courseId}` - Lister les avis pour un cours
+- `GET /avis/{courseId}/aggregate` - Agrégat des avis (moyennes)
+- `POST /avis` - Ajouter un avis (body : `courseId`, `difficulty`, `workload`, `comment`)
+
+### Ensembles de cours
+
+- `POST /sets` - Créer un ensemble (body : `semester`, `courseIds`)
+- `GET /sets/{id}` - Consulter un ensemble
+- `GET /sets/{id}/schedule` - Horaire d'un ensemble
+- `GET /sets/{id}/conflicts` - Détecter les conflits d'horaire
+
+### Utilisateurs
+
+- `GET /users` - Lister les utilisateurs
+- `GET /users/{id}` - Détails d'un utilisateur
+
+**Note:** Tous les endpoints retournent du JSON. L'API est documentée dans le code source (`Routes.java` et contrôleurs).
 
 ## Lancer les tests
-Tous les tests JUnit se trouvent dans src/test/java.
 
-**Lancer tous les tests** :
+Tous les tests unitaires sont situés dans \`src/test/java\`.
 
+**Lancer tous les tests**
+
+```bash
 mvn test
-**Lancer uniquement une classe de tests** :
+```
 
+**Lancer une classe de tests spécifique**
+
+```bash
 mvn -Dtest=CourseServiceTest test
+```
 
+## Bot Discord – Avis étudiants
 
+Les avis étudiants sont collectés via un bot Discord minimal, conformément à l'énoncé.
 
-##  Bot Discord – Avis étudiants
+### Fonctionnalités
 
-Les avis étudiants sont collectés via un bot Discord minimal, conformément à l’énoncé.
+- Collecte d'avis étudiants depuis un canal Discord dédié
+- Transmission des avis à l'API REST via `POST /avis`
 
-### Fonctionnalité
-- Collecte d’avis étudiants depuis un canal Discord dédié
-- Envoi des avis à l’API REST via l’endpoint `POST /avis`
+### Configuration et exécution du bot
 
-### Lien du serveur Discord de test
+**Prérequis**
+
+- Python 3.8+
+- Token Discord Bot (obtenu via Discord Developer Portal)
+
+**Installation des dépendances**
+
+```bash
+cd discord-bot
+python -m venv venv
+source venv/bin/activate  # Sur Windows : venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+**Configuration**
+
+Créer un fichier `.env` dans le dossier `discord-bot/` :
+
+```bash
+cp .env.example .env
+```
+
+Éditer `.env` et ajouter votre token Discord :
+
+```
+DISCORD_TOKEN=votre_token_ici
+API_BASE_URL=http://localhost:7070
+```
+
+**Lancer le bot**
+
+```bash
+python bot.py
+```
+
+**Utilisation**
+
+Dans le canal Discord `#avis-cours`, utiliser la commande :
+
+```
+!avis IFT2255 4 5 Excellent cours, très formateur!
+```
+
+### Serveur Discord de test
+
 https://discord.gg/YRGSyEAh
 
 ### Canal utilisé
+
 - `#avis-cours`
 
-### Détails techniques
-- Implémenté en Python avec `discord.py`
-- Documentation complète disponible dans `discord-bot/README.md`
+### Documentation complète
+
+Pour plus de détails sur le bot Discord (commandes, architecture, exemples), consultez :
+
+**`discord-bot/README.md`**

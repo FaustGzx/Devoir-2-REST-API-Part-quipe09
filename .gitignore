@@ -29,3 +29,6 @@ temp/
 
 # Maven build folder
 target/
+
+# Fichier généré automatiquement par maven-shade-plugin
+dependency-reduced-pom.xml

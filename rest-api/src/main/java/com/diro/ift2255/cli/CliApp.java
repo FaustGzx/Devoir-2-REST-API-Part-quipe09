@@ -10,10 +10,10 @@ import java.util.*;
  * Le CLI ne contient PAS de logique métier, il appelle l'API et affiche les résultats.
  * 
  * Lancement :
- *   mvn exec:java -Dexec.mainClass="com.diro.ift2255.cli.CliApp"
+ *   mvn exec:java@cli
  *   
  * Avec URL personnalisée :
- *   mvn exec:java -Dexec.mainClass="com.diro.ift2255.cli.CliApp" -Dexec.args="--baseUrl=http://localhost:7070"
+ *   mvn exec:java@cli -Dexec.args="--baseUrl=http://localhost:7070"
  */
 public class CliApp {
 
@@ -60,7 +60,7 @@ public class CliApp {
         // Sanity check : tester la connexion à l'API
         if (!testApiConnection()) {
             CliPrinter.printError("Impossible de se connecter à l'API sur " + apiClient.getBaseUrl());
-            CliPrinter.printInfo("Assurez-vous que le serveur est démarré (mvn exec:java)");
+            CliPrinter.printInfo("Assurez-vous que le serveur est démarré (mvn exec:java@server)");
             return;
         }
 
