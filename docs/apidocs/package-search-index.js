@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.diro.ift2255"},{"l":"com.diro.ift2255.cli"},{"l":"com.diro.ift2255.config"},{"l":"com.diro.ift2255.controller"},{"l":"com.diro.ift2255.model"},{"l":"com.diro.ift2255.service"},{"l":"com.diro.ift2255.util"}];updateSearchResults();
