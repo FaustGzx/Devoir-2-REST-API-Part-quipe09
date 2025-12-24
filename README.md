@@ -130,7 +130,8 @@ mvn -DskipTests package
 Cela génère dans `target/` :
 
 - `ift2255-cli.jar` → fat-jar exécutable du client CLI
-- `rest-api-1.0-SNAPSHOT.jar` → JAR standard du serveur
+- `rest-api-1.0-SNAPSHOT.jar` → JAR standard contenant les classes du serveur REST (non exécutable).  
+  Le serveur se lance via Maven avec : `mvn exec:java@server`
 
 **Build complet recommandé (pour validation complète)**
 
