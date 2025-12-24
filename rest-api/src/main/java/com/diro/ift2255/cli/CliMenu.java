@@ -172,7 +172,7 @@ public class CliMenu {
     public void printWelcome(String baseUrl) {
         System.out.println();
         System.out.println("╔══════════════════════════════════════════════════╗");
-        System.out.println("║     🎓 OUTIL DE CHOIX DE COURS - IFT2255         ║");
+        System.out.println("║     OUTIL DE CHOIX DE COURS - IFT2255            ║");
         System.out.println("╚══════════════════════════════════════════════════╝");
         System.out.println("  API : " + baseUrl);
         System.out.println();
@@ -180,7 +180,7 @@ public class CliMenu {
 
     public void printGoodbye() {
         System.out.println();
-        System.out.println("Au revoir ! 👋");
+        System.out.println("Au revoir!");
     }
 
     public void printInvalidOption() {

@@ -39,19 +39,19 @@ public class CliPrinter {
     // ========================================================================
 
     public static void printSuccess(String message) {
-        System.out.println("✅ " + message);
+        System.out.println("[SUCCESS] " + message);
     }
 
     public static void printError(String message) {
-        System.out.println("❌ " + message);
+        System.out.println("[ERROR] " + message);
     }
 
     public static void printWarning(String message) {
-        System.out.println("⚠️  " + message);
+        System.out.println("[WARN] " + message);
     }
 
     public static void printInfo(String message) {
-        System.out.println("ℹ️  " + message);
+        System.out.println("[INFO] " + message);
     }
 
     public static void printApiError(ApiClient.ApiResponse response) {
@@ -118,7 +118,7 @@ public class CliPrinter {
                 ? course.get("credits").asDouble() : null;
 
         System.out.println();
-        System.out.println("  📚 " + id + " - " + name);
+        System.out.println("  [COURSE] " + id + " - " + name);
         printSeparator();
 
         if (description != null && !description.isBlank()) {
@@ -182,7 +182,7 @@ public class CliPrinter {
             for (JsonNode section : schedule.get("sections")) {
                 String sectionName = getTextSafe(section, "name");
                 System.out.println();
-                System.out.println("  📍 Section " + sectionName);
+                System.out.println("  [SECTION] " + sectionName);
 
                 // Profs
                 if (section.has("teachers") && section.get("teachers").isArray()) {
@@ -292,7 +292,7 @@ public class CliPrinter {
             int workload = review.has("workload") ? review.get("workload").asInt() : 0;
             String comment = getTextSafe(review, "comment");
 
-            System.out.println("  ⭐ Difficulté: " + difficulty + "/5 | Charge: " + workload + "/5");
+            System.out.println("  [REVIEW] Difficulté: " + difficulty + "/5 | Charge: " + workload + "/5");
             if (comment != null && !comment.isBlank()) {
                 System.out.println("     \"" + comment + "\"");
             }

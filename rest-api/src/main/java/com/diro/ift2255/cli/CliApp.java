@@ -269,7 +269,7 @@ public class CliApp {
         // Afficher infos de base
         String name = course.has("name") ? course.get("name").asText() : "";
         System.out.println();
-        System.out.println("  📚 " + sigle + " - " + name);
+        System.out.println("  [COURSE] " + sigle + " - " + name);
 
         // Afficher horaire
         if (course.has("schedules")) {
@@ -591,7 +591,7 @@ public class CliApp {
                 String name = course.has("name") ? course.get("name").asText() : "";
                 
                 System.out.println();
-                System.out.println("  📚 " + courseId + " - " + name);
+                System.out.println("  [COURSE] " + courseId + " - " + name);
                 
                 if (course.has("schedules")) {
                     CliPrinter.printSchedule(course.get("schedules"), "");

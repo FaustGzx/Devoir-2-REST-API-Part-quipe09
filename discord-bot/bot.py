@@ -30,7 +30,7 @@ API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:7070").rstrip("/")
 ALLOWED_CHANNEL = os.getenv("ALLOWED_CHANNEL", "avis-cours").strip()
 
 if not DISCORD_TOKEN:
-    raise RuntimeError("❌ DISCORD_TOKEN manquant. Mets-le dans ton fichier .env")
+    raise RuntimeError("DISCORD_TOKEN manquant. Mets-le dans ton fichier .env")
 
 # Configuration Discord
 intents = discord.Intents.default()
@@ -57,14 +57,14 @@ async def on_ready():
     """Appelé quand le bot est connecté et prêt."""
     print("=" * 50)
     print(f"✅ Bot connecté en tant que: {client.user}")
-    print(f"📡 API_BASE_URL: {API_BASE_URL}")
-    print(f"📢 Canal autorisé: #{ALLOWED_CHANNEL}")
+    print(f"API_BASE_URL: {API_BASE_URL}")
+    print(f"Canal autorisé: #{ALLOWED_CHANNEL}")
     print("=" * 50)
-    print("\n📝 Format des avis:")
+    print("\nFormat des avis:")
     print("   !avis IFT2255 4 3 Commentaire optionnel")
     print("   - difficulté: 1-5")
     print("   - charge: 1-5")
-    print("\n⏳ En attente de messages...")
+    print("\nEn attente de messages...")
 
 
 @client.event
@@ -84,7 +84,7 @@ async def on_message(message: discord.Message):
     # Commande d'aide
     if content.lower() in ("!avis-help", "!avis help", "!help-avis"):
         help_text = (
-            "**📚 Bot Avis IFT2255**\n\n"
+            "**Bot Avis IFT2255**\n\n"
             "**Format:** `!avis CODE DIFF CHARGE [commentaire]`\n\n"
             "**Exemple:**\n"
             "```\n!avis IFT2255 4 3 Bon cours mais demandant.\n```\n\n"
@@ -107,7 +107,7 @@ async def on_message(message: discord.Message):
         # Si le message commence par !avis mais ne correspond pas au format
         if content.lower().startswith("!avis"):
             await message.channel.send(
-                "❌ Format invalide. Utilise: `!avis IFT2255 4 3 commentaire optionnel`\n"
+                "Format invalide. Utilise: `!avis IFT2255 4 3 commentaire optionnel`\n"
                 "Tape `!avis-help` pour plus d'infos."
             )
         return
@@ -130,7 +130,7 @@ async def on_message(message: discord.Message):
     }
 
     # Log côté serveur
-    print(f"\n📨 Nouvel avis de {message.author.display_name}:")
+    print(f"\nNouvel avis de {message.author.display_name}:")
     print(f"   Cours: {course_code}")
     print(f"   Difficulté: {difficulty}/5")
     print(f"   Charge: {workload}/5")
@@ -142,7 +142,7 @@ async def on_message(message: discord.Message):
         
         if 200 <= response.status_code < 300:
             await message.add_reaction("✅")
-            print(f"   ✅ Envoyé avec succès!")
+            print(f"   Envoyé avec succès!")
             
             # Message de confirmation
             confirm_msg = (
@@ -153,29 +153,25 @@ async def on_message(message: discord.Message):
             )
             await message.channel.send(confirm_msg)
         else:
-            await message.add_reaction("❌")
             error_detail = response.text[:200] if response.text else "Pas de détails"
-            print(f"   ❌ Erreur API: {response.status_code}")
+            print(f"   Erreur API: {response.status_code}")
             await message.channel.send(
-                f"❌ Erreur API ({response.status_code}): {error_detail}"
+                f"Erreur API ({response.status_code}): {error_detail}"
             )
             
     except requests.exceptions.ConnectionError:
-        await message.add_reaction("⚠️")
-        print(f"   ⚠️ API non accessible!")
+        print(f"   API non accessible!")
         await message.channel.send(
-            "⚠️ Impossible de joindre l'API. Vérifiez que le backend est démarré."
+            "Impossible de joindre l'API. Vérifiez que le backend est démarré."
         )
     except requests.exceptions.Timeout:
-        await message.add_reaction("⏱️")
-        print(f"   ⏱️ Timeout API!")
-        await message.channel.send("⏱️ L'API met trop de temps à répondre.")
+        print(f"   Timeout API!")
+        await message.channel.send("L'API met trop de temps à répondre.")
     except Exception as e:
-        await message.add_reaction("💥")
-        print(f"   💥 Erreur inattendue: {e}")
-        await message.channel.send(f"💥 Erreur inattendue: {e}")
+        print(f"   Erreur inattendue: {e}")
+        await message.channel.send(f"Erreur inattendue: {e}")
 
 
 if __name__ == "__main__":
-    print("\n🚀 Démarrage du bot Discord IFT2255...")
+    print("\nDémarrage du bot Discord IFT2255...")
     client.run(DISCORD_TOKEN)
