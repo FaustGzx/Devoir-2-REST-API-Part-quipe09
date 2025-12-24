@@ -1,0 +1,15 @@
+[ {
+  "courseId" : "IFT2255",
+  "difficulty" : 4,
+  "workload" : 5,
+  "comment" : "ok",
+  "author" : "test",
+  "timestamp" : 1766453625423
+}, {
+  "courseId" : "IFT2255",
+  "difficulty" : 4,
+  "workload" : 5,
+  "comment" : "ok",
+  "author" : "test",
+  "timestamp" : 1766459109730
+} ]

@@ -1,3 +1,4 @@
+// src/main/java/com/diro/ift2255/model/Course.java
 package com.diro.ift2255.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -9,34 +10,25 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Course {
 
-    // Champs de base
     private String id;
     private String name;
     private String description;
 
-    // Champs supplémentaires pertinents de l'API Planifium
     @JsonProperty("prerequisite_courses")
     private List<String> prerequisiteCourses;
 
-    // Nombre de crédits du cours
     private Double credits;
 
-    // Texte lisible des prérequis (ex: "Préalable : IFT1025")
     @JsonProperty("requirement_text")
     private String requirementText;
 
-    // Trimestres où le cours est offert (autumn, winter, summer)
     @JsonProperty("available_terms")
     private Map<String, Boolean> availableTerms;
 
-    // Périodes où le cours est offert (daytime, evening)
     @JsonProperty("available_periods")
     private Map<String, Boolean> availablePeriods;
 
-    // Liste des horaires / offres du cours (sections, profs, etc.)
     private List<Schedule> schedules;
-
-    // ----- Constructeurs -----
 
     public Course() {}
 
@@ -46,84 +38,32 @@ public class Course {
         this.description = description;
     }
 
-    // ----- Getters / Setters -----
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public String getId() {
-        return id;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public String getName() {
-        return name;
-    }
+    public List<String> getPrerequisiteCourses() { return prerequisiteCourses; }
+    public void setPrerequisiteCourses(List<String> prerequisiteCourses) { this.prerequisiteCourses = prerequisiteCourses; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public Double getCredits() { return credits; }
+    public void setCredits(Double credits) { this.credits = credits; }
 
-    public String getDescription() {
-        return description;
-    }
+    public String getRequirementText() { return requirementText; }
+    public void setRequirementText(String requirementText) { this.requirementText = requirementText; }
 
-    // (bug corrigé : ce n'est plus "email")
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public Map<String, Boolean> getAvailableTerms() { return availableTerms; }
+    public void setAvailableTerms(Map<String, Boolean> availableTerms) { this.availableTerms = availableTerms; }
 
-    public List<String> getPrerequisiteCourses() {
-        return prerequisiteCourses;
-    }
+    public Map<String, Boolean> getAvailablePeriods() { return availablePeriods; }
+    public void setAvailablePeriods(Map<String, Boolean> availablePeriods) { this.availablePeriods = availablePeriods; }
 
-    public void setPrerequisiteCourses(List<String> prerequisiteCourses) {
-        this.prerequisiteCourses = prerequisiteCourses;
-    }
-
-    public Double getCredits() {
-        return credits;
-    }
-
-    public void setCredits(Double credits) {
-        this.credits = credits;
-    }
-
-    public String getRequirementText() {
-        return requirementText;
-    }
-
-    public void setRequirementText(String requirementText) {
-        this.requirementText = requirementText;
-    }
-
-    public Map<String, Boolean> getAvailableTerms() {
-        return availableTerms;
-    }
-
-    public void setAvailableTerms(Map<String, Boolean> availableTerms) {
-        this.availableTerms = availableTerms;
-    }
-
-    public Map<String, Boolean> getAvailablePeriods() {
-        return availablePeriods;
-    }
-
-    public void setAvailablePeriods(Map<String, Boolean> availablePeriods) {
-        this.availablePeriods = availablePeriods;
-    }
-
-    public List<Schedule> getSchedules() {
-        return schedules;
-    }
-
-    public void setSchedules(List<Schedule> schedules) {
-        this.schedules = schedules;
-    }
-
-    // ========================================================================
-    // Classes imbriquées pour mapper schedules / sections
-    // ========================================================================
+    public List<Schedule> getSchedules() { return schedules; }
+    public void setSchedules(List<Schedule> schedules) { this.schedules = schedules; }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Schedule {
@@ -132,94 +72,48 @@ public class Course {
         private String fetchDate;
 
         private String name;
-
         private List<Section> sections;
 
         public Schedule() {}
 
-        public String getFetchDate() {
-            return fetchDate;
-        }
+        public String getFetchDate() { return fetchDate; }
+        public void setFetchDate(String fetchDate) { this.fetchDate = fetchDate; }
 
-        public void setFetchDate(String fetchDate) {
-            this.fetchDate = fetchDate;
-        }
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
 
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public List<Section> getSections() {
-            return sections;
-        }
-
-        public void setSections(List<Section> sections) {
-            this.sections = sections;
-        }
+        public List<Section> getSections() { return sections; }
+        public void setSections(List<Section> sections) { this.sections = sections; }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Section {
 
         private String name;
-
-        // Dans le JSON c’est "capacity": "130" → on garde String pour être souple
         private String capacity;
 
         @JsonProperty("number_inscription")
         private String numberInscription;
 
-        // Liste des profs ['Feeley, Marc', ...]
         private List<String> teachers;
 
-        // On ne connaît pas exactement la structure des "volets",
-        // donc on reste générique : une liste de maps clé/valeur
         private List<Map<String, Object>> volets;
 
         public Section() {}
 
-        public String getName() {
-            return name;
-        }
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
 
-        public void setName(String name) {
-            this.name = name;
-        }
+        public String getCapacity() { return capacity; }
+        public void setCapacity(String capacity) { this.capacity = capacity; }
 
-        public String getCapacity() {
-            return capacity;
-        }
+        public String getNumberInscription() { return numberInscription; }
+        public void setNumberInscription(String numberInscription) { this.numberInscription = numberInscription; }
 
-        public void setCapacity(String capacity) {
-            this.capacity = capacity;
-        }
+        public List<String> getTeachers() { return teachers; }
+        public void setTeachers(List<String> teachers) { this.teachers = teachers; }
 
-        public String getNumberInscription() {
-            return numberInscription;
-        }
-
-        public void setNumberInscription(String numberInscription) {
-            this.numberInscription = numberInscription;
-        }
-
-        public List<String> getTeachers() {
-            return teachers;
-        }
-
-        public void setTeachers(List<String> teachers) {
-            this.teachers = teachers;
-        }
-
-        public List<Map<String, Object>> getVolets() {
-            return volets;
-        }
-
-        public void setVolets(List<Map<String, Object>> volets) {
-            this.volets = volets;
-        }
+        public List<Map<String, Object>> getVolets() { return volets; }
+        public void setVolets(List<Map<String, Object>> volets) { this.volets = volets; }
     }
 }

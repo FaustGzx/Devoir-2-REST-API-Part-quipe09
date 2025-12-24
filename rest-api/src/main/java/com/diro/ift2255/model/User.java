@@ -1,3 +1,4 @@
+// src/main/java/com/diro/ift2255/model/User.java
 package com.diro.ift2255.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
