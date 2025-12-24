@@ -13,15 +13,23 @@ import java.time.Duration;
 import java.util.Map;
 
 /**
- * Client HTTP pour communiquer avec l'API REST.
- * Le CLI ne contient pas de logique métier, il appelle juste l'API.
+ * Client HTTP utilisé par l’interface en ligne de commande (CLI)
+ * pour communiquer avec l’API REST du serveur.
+ *
+ * <p>Cette classe fournit des méthodes utilitaires pour envoyer
+ * des requêtes HTTP (GET, POST) et récupérer des réponses
+ * sous une forme standardisée.</p>
  */
 public class ApiClient {
 
     private final String baseUrl;
     private final HttpClient httpClient;
     private final ObjectMapper mapper;
-
+    /**
+    * Construit un client API avec une URL de base.
+    *
+    * @param baseUrl URL de base du serveur REST
+    */
     public ApiClient(String baseUrl) {
         this.baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
         this.httpClient = HttpClient.newBuilder()
@@ -31,13 +39,21 @@ public class ApiClient {
     }
 
     /**
-     * GET request vers l'API.
-     * @return ApiResponse avec success, data, message, et status HTTP
-     */
+    * Envoie une requête HTTP GET vers un endpoint donné.
+    *
+    * @param endpoint chemin relatif de l’endpoint (ex: "/courses")
+    * @return réponse de l’API encapsulée dans un {@link ApiResponse}
+    */
     public ApiResponse get(String endpoint) {
         return get(endpoint, Map.of());
     }
-
+    /**
+    * Envoie une requête HTTP GET avec des paramètres de requête.
+    *
+    * @param endpoint chemin relatif de l’endpoint
+    * @param queryParams paramètres de requête à inclure dans l’URL
+    * @return réponse de l’API encapsulée dans un {@link ApiResponse}
+    */
     public ApiResponse get(String endpoint, Map<String, String> queryParams) {
         try {
             String url = buildUrl(endpoint, queryParams);
@@ -57,8 +73,12 @@ public class ApiClient {
     }
 
     /**
-     * POST request vers l'API avec body JSON.
-     */
+    * Envoie une requête HTTP POST avec un corps JSON.
+    *
+    * @param endpoint chemin relatif de l’endpoint
+    * @param body objet à sérialiser et envoyer dans le corps de la requête
+    * @return réponse de l’API encapsulée dans un {@link ApiResponse}
+    */
     public ApiResponse post(String endpoint, Object body) {
         try {
             String jsonBody = mapper.writeValueAsString(body);
@@ -122,6 +142,12 @@ public class ApiClient {
     // ========================================================================
     // Classe interne pour les réponses API
     // ========================================================================
+    /**
+    * Représente une réponse standardisée retournée par l’API REST.
+    *
+    * <p>Elle contient un indicateur de succès, les données retournées,
+    * un message descriptif et un code de statut HTTP.</p>
+    */
     public static class ApiResponse {
         private final boolean success;
         private final JsonNode data;

@@ -9,7 +9,11 @@ import java.util.Scanner;
 public class CliMenu {
 
     private final Scanner scanner;
-
+    /**
+    * Construit le menu CLI avec un scanner pour lire les entrées utilisateur.
+    *
+    * @param scanner scanner utilisé pour lire l’entrée standard
+    */
     public CliMenu(Scanner scanner) {
         this.scanner = scanner;
     }
@@ -36,10 +40,15 @@ public class CliMenu {
         System.out.println("╚══════════════════════════════════════════════════╝");
         System.out.print("Votre choix : ");
     }
-
+    /**
+    * Demande à l’utilisateur de choisir une option du menu principal.
+    *
+    * @return choix saisi par l’utilisateur
+    */
     public String getMainMenuChoice() {
         return scanner.nextLine().trim();
     }
+    
 
     // ========================================================================
     // Sous-menu Recherche
@@ -88,7 +97,12 @@ public class CliMenu {
     // ========================================================================
     // Entrées utilisateur avec validation
     // ========================================================================
-
+    /**
+    * Demande une entrée texte à l’utilisateur.
+    *
+    * @param prompt message affiché à l’utilisateur
+    * @return texte saisi par l’utilisateur
+    */
     public String askForInput(String prompt) {
         System.out.print(prompt);
         return scanner.nextLine().trim();
@@ -105,7 +119,12 @@ public class CliMenu {
         
         return input;
     }
-
+    /**
+    * Demande à l’utilisateur de saisir un trimestre.
+    *
+    * @param prompt message affiché à l’utilisateur
+    * @return code du trimestre (ex : H25, A24, E24)
+    */
     public String askForSemester(String prompt) {
         System.out.print(prompt != null ? prompt : "Trimestre (ex: H25, A25, E25) : ");
         String input = scanner.nextLine().trim().toUpperCase();
@@ -122,7 +141,14 @@ public class CliMenu {
         
         return input;
     }
-
+    /**
+    * Demande une note numérique à l’utilisateur dans un intervalle donné.
+    *
+    * @param prompt message affiché à l’utilisateur
+    * @param min valeur minimale acceptée
+    * @param max valeur maximale acceptée
+    * @return valeur saisie par l’utilisateur
+    */
     public int askForRating(String prompt, int min, int max) {
         System.out.print(prompt + " (" + min + "-" + max + ") : ");
         try {

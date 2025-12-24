@@ -3,6 +3,13 @@ package com.diro.ift2255.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+/**
+ * Représente un avis étudiant associé à un cours.
+ *
+ * <p>Un {@code Review} contient une évaluation de la difficulté,
+ * de la charge de travail ainsi qu’un commentaire optionnel
+ * fourni par un étudiant.</p>
+ */
 public class Review {
 
     private String courseId;     // IFT2255

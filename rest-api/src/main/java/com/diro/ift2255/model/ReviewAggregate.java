@@ -1,7 +1,12 @@
 package com.diro.ift2255.model;
 
 import java.util.List;
-
+/**
+ * Représente les statistiques agrégées des avis étudiants pour un cours.
+ *
+ * <p>Contient notamment les valeurs moyennes de difficulté et de charge de travail,
+ * calculées à partir de l’ensemble des avis disponibles.</p>
+ */
 public class ReviewAggregate {
     private String courseId;
     private int count;

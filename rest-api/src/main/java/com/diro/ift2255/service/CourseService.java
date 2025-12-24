@@ -7,6 +7,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.net.URI;
 import java.util.*;
+/**
+ * Service responsable de l’accès aux informations des cours.
+ *
+ * <p>Ce service agit comme une façade entre l’API Planifium
+ * et le reste de l’application. Il permet de rechercher des cours,
+ * récupérer leurs détails et leurs horaires selon un trimestre donné.</p>
+ */
 
 public class CourseService {
 

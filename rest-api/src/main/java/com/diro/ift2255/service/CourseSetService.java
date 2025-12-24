@@ -4,6 +4,13 @@ import com.diro.ift2255.model.Course;
 import com.diro.ift2255.model.CourseSet;
 
 import java.util.*;
+/**
+ * Service responsable de la gestion des ensembles de cours.
+ *
+ * <p>Ce service permet de créer des ensembles de cours,
+ * de calculer l’horaire résultant pour un trimestre donné
+ * et de détecter les conflits d’horaire éventuels.</p>
+ */
 
 public class CourseSetService {
 

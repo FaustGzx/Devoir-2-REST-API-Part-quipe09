@@ -7,11 +7,22 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+/**
+ * Service responsable du chargement et de la consultation des résultats académiques agrégés
+ * (données CSV) pour les cours.
+ *
+ * <p>Les résultats sont chargés au démarrage depuis une ressource (classpath)
+ * et indexés par sigle de cours (ex : IFT2255).</p>
+ */
 
 public class AcademicResultService {
-
+    /** Index des résultats académiques agrégés, par sigle de cours (en majuscules). */
     private final Map<String, AcademicResult> bySigle = new HashMap<>();
-
+    /**
+    * Construit le service et charge les résultats académiques agrégés depuis une ressource CSV.
+    *
+    * @param resourceName nom/chemin de la ressource CSV sur le classpath (ex : "results.csv")
+    */
     public AcademicResultService(String resourceName) {
         loadFromResource(resourceName);
     }
@@ -84,7 +95,12 @@ public class AcademicResultService {
         out.add(cur.toString());
         return out;
     }
-
+    /**
+    * Retourne les résultats académiques agrégés pour un cours donné.
+    *
+    * @param sigle sigle du cours (ex : "IFT2255"), non sensible à la casse
+    * @return un {@link Optional} contenant les résultats si trouvés, sinon vide
+    */
     public Optional<AcademicResult> getBySigle(String sigle) {
         if (sigle == null) return Optional.empty();
         return Optional.ofNullable(bySigle.get(sigle.trim().toUpperCase()));

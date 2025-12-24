@@ -7,6 +7,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.net.URI;
 import java.util.*;
+/**
+ * Service responsable de l’accès aux informations des programmes universitaires.
+ *
+ * <p>Ce service permet de récupérer les programmes et leurs cours
+ * associés depuis l’API Planifium, en fournissant une interface
+ * simplifiée au reste de l’application.</p>
+ */
 
 public class ProgramService {
 

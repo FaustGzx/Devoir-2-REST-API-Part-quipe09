@@ -8,17 +8,55 @@ import io.javalin.http.Context;
 
 import java.util.List;
 import java.util.Objects;
-
+/**
+ * Contrôleur REST (Javalin) pour la gestion des ensembles de cours (CourseSet).
+ *
+ * <p>Permet :</p>
+ * <ul>
+ *   <li>de créer un ensemble (max 6 cours) pour un trimestre donné</li>
+ *   <li>de récupérer un ensemble existant</li>
+ *   <li>de consulter l'horaire résultant d'un ensemble</li>
+ *   <li>de détecter les conflits d'horaire (bonus) pour un ensemble</li>
+ * </ul>
+ *
+ * Les réponses JSON sont standardisées via {@link com.diro.ift2255.util.ResponseUtil}.
+ */
 public class CourseSetController {
 
+    /** Service applicatif responsable de la création, consultation et analyse des ensembles de cours. */
     private final CourseSetService service;
+
+    /** Mapper JSON utilisé pour lire le corps des requêtes (POST) et valider la structure du JSON. */
     private final ObjectMapper mapper = new ObjectMapper();
 
+    /**
+    * Construit un {@code CourseSetController}.
+    *
+    * @param service service de gestion des ensembles de cours
+    */
     public CourseSetController(CourseSetService service) {
         this.service = service;
     }
 
-    // POST /sets  body: { "semester":"H25", "courseIds":["IFT2255","IFT1025"] }
+    /**
+    * Crée un ensemble de cours (maximum 6 cours) pour un trimestre donné.
+    *
+    * <p>Endpoint : {@code POST /sets}</p>
+    * <p>Corps JSON attendu (exemple) :</p>
+    * <pre>{@code
+    * { "semester":"H25", "courseIds":["IFT2255","IFT1025"] }
+    * }</pre>
+    *
+    * <p>Validations principales :</p>
+    * <ul>
+    *   <li>{@code semester} requis (format H25/A24/E24)</li>
+    *   <li>{@code courseIds} requis, non vide, sans doublons</li>
+    *   <li>maximum 6 cours</li>
+    *   <li>format de sigle : {@code ABC1234}</li>
+    * </ul>
+    *
+    * @param ctx contexte Javalin (corps JSON de la requête + réponse JSON)
+    */
     public void createSet(Context ctx) {
         try {
             String raw = ctx.body();
@@ -93,7 +131,15 @@ public class CourseSetController {
         }
     }
 
-    // GET /sets/{id}
+    
+    /**
+    * Récupère un ensemble de cours par son identifiant.
+    *
+    * <p>Endpoint : {@code GET /sets/{id}}</p>
+    *
+    * @param ctx contexte Javalin (paramètre de chemin {@code id} + réponse JSON)
+    */
+
     public void getSet(Context ctx) {
         String id = ctx.pathParam("id");
         
@@ -110,7 +156,13 @@ public class CourseSetController {
         ctx.json(ResponseUtil.ok(opt.get()));
     }
 
-    // GET /sets/{id}/schedule
+    /**
+    * Retourne l'horaire résultant d'un ensemble de cours.
+    *
+    * <p>Endpoint : {@code GET /sets/{id}/schedule}</p>
+    *
+    * @param ctx contexte Javalin (paramètre de chemin {@code id} + réponse JSON)
+    */
     public void getSetSchedule(Context ctx) {
         String id = ctx.pathParam("id");
         
@@ -127,7 +179,13 @@ public class CourseSetController {
         ctx.json(ResponseUtil.ok(service.getSetSchedule(id)));
     }
 
-    // GET /sets/{id}/conflicts - BONUS: Détection des conflits d'horaire
+    /**
+    * Détecte les conflits d'horaire dans un ensemble de cours (bonus).
+    *
+    * <p>Endpoint : {@code GET /sets/{id}/conflicts}</p>
+    *
+    * @param ctx contexte Javalin (paramètre de chemin {@code id} + réponse JSON)
+    */
     public void getSetConflicts(Context ctx) {
         String id = ctx.pathParam("id");
         

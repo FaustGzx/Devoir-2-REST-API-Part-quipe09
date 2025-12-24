@@ -23,7 +23,11 @@ public class CliApp {
     private final CliMenu menu;
     private final Scanner scanner;
     private boolean running;
-
+    /**
+    * Construit l’application CLI en configurant l’URL de base du serveur REST.
+    *
+    * @param baseUrl URL de base du serveur REST (ex : "http://localhost:7000")
+    */
     public CliApp(String baseUrl) {
         this.scanner = new Scanner(System.in);
         this.apiClient = new ApiClient(baseUrl);
@@ -31,6 +35,11 @@ public class CliApp {
         this.running = true;
     }
 
+    /**
+    * Point d’entrée principal du programme CLI.
+    *
+    * @param args arguments de la ligne de commande (ex : "--baseUrl=...")
+    */
     public static void main(String[] args) {
         String baseUrl = DEFAULT_BASE_URL;
 
@@ -52,8 +61,9 @@ public class CliApp {
     }
 
     /**
-     * Boucle principale du CLI.
-     */
+    * Lance la boucle principale du CLI et gère l’interaction avec l’utilisateur.
+    */
+
     public void run() {
         menu.printWelcome(apiClient.getBaseUrl());
 
@@ -627,4 +637,4 @@ public class CliApp {
 
         menu.pressEnterToContinue();
     }
-}
+git pull}

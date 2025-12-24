@@ -4,9 +4,23 @@ import com.diro.ift2255.controller.*;
 import com.diro.ift2255.service.*;
 import com.diro.ift2255.util.HttpClientApi;
 import io.javalin.Javalin;
-
+/**
+ * Centralise la définition et l’enregistrement de toutes les routes
+ * de l’API REST de l’application.
+ *
+ * <p>Cette classe associe chaque endpoint HTTP à son contrôleur
+ * correspondant (cours, programmes, avis, utilisateurs, etc.).
+ * Elle constitue le point d’entrée principal des routes côté serveur.</p>
+ */
 public class Routes {
-
+    /**
+    * Enregistre l’ensemble des routes de l’API sur l’instance Javalin.
+    *
+    * <p>Cette méthode définit toutes les routes HTTP de l’application
+    * et les relie aux contrôleurs appropriés.</p>
+    *
+     * @param app instance du serveur Javalin utilisée pour définir les routes
+    */
     public static void register(Javalin app) {
         // Instancier les dépendances partagées 1 seule fois
         HttpClientApi api = new HttpClientApi();

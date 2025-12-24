@@ -3,16 +3,37 @@ package com.diro.ift2255.controller;
 import com.diro.ift2255.service.ProgramService;
 import com.diro.ift2255.util.ResponseUtil;
 import io.javalin.http.Context;
+/**
+ * Contrôleur REST (Javalin) responsable des opérations liées aux programmes académiques.
+ *
+ * <p>Permet :</p>
+ * <ul>
+ *   <li>de consulter les informations d’un programme</li>
+ *   <li>de lister les cours offerts dans un programme pour un trimestre donné</li>
+ * </ul>
+ *
+ * Les réponses sont formatées de manière standard via {@link com.diro.ift2255.util.ResponseUtil}.
+ */
 
 public class ProgramController {
-
+    /** Service applicatif fournissant l’accès aux programmes et à leurs cours associés. */
     private final ProgramService service;
-
+    /**
+    * Construit un {@code ProgramController}.
+    *
+    * @param service service de gestion des programmes académiques
+    */
     public ProgramController(ProgramService service) {
         this.service = service;
     }
 
-    // GET /programs/{id}?response_level=min|reg|full
+    /**
+    * Retourne les informations d’un programme à partir de son identifiant.
+    *
+    * <p>Endpoint : {@code GET /programs/{programId}}</p>
+    *
+    * @param ctx contexte Javalin (paramètre de chemin {@code programId} + réponse JSON)
+    */
     public void getProgram(Context ctx) {
         String id = ctx.pathParam("id");
         String level = ctx.queryParam("response_level");
@@ -26,7 +47,14 @@ public class ProgramController {
         ctx.json(ResponseUtil.ok(opt.get()));
     }
 
-    // GET /programs/{id}/courses?semester=H25&limit=200
+    /**
+    * Retourne la liste des cours offerts dans un programme pour un trimestre donné.
+    *
+    * <p>Endpoint : {@code GET /programs/{programId}/courses?semester=H25}</p>
+    *
+    * @param ctx contexte Javalin (paramètre de chemin {@code programId},
+    *            paramètre de requête {@code semester} + réponse JSON)
+    */
     public void getProgramCoursesOfferedInSemester(Context ctx) {
         String id = ctx.pathParam("id");
         String semester = ctx.queryParam("semester");

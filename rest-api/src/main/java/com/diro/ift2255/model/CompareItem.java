@@ -1,5 +1,11 @@
 package com.diro.ift2255.model;
-
+/**
+ * Représente un élément utilisé pour comparer des cours entre eux.
+ *
+ * <p>Un {@code CompareItem} agrège plusieurs indicateurs provenant
+ * des avis étudiants, des résultats académiques et du catalogue
+ * afin de faciliter la comparaison (charge de travail, difficulté, réussite, etc.).</p>
+ */
 public class CompareItem {
     private String id;
     private String name;
@@ -13,9 +19,24 @@ public class CompareItem {
     private Double csvScore;      // null si absent
     private Integer participants; // null si absent
     private String moyenne;       // null si absent
-
+    /**
+    * Construit un {@code CompareItem} vide.
+    *
+    * <p>Utilisé principalement pour la désérialisation JSON.</p>
+    */
     public CompareItem() {}
-
+    /**
+    * Construit un élément de comparaison de cours.
+    *
+    * @param id identifiant du cours
+    * @param name nom du cours
+    * @param avgDifficulty difficulté moyenne estimée
+    * @param avgWorkload charge de travail moyenne estimée
+    * @param csvScore score de réussite académique
+    * @param participants nombre de participants
+    * @param reviewCount nombre d’avis étudiants
+    * @param moyenne moyenne littérale observée
+    */
     public CompareItem(String id, String name,
                        int reviewCount, double avgDifficulty, double avgWorkload,
                        Double csvScore, Integer participants, String moyenne) {

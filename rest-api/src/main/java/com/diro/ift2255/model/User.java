@@ -4,13 +4,30 @@ package com.diro.ift2255.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+/**
+ * Représente un utilisateur de l’application.
+ *
+ * <p>Un {@code User} peut contenir des informations de base
+ * permettant une personnalisation éventuelle de l’expérience
+ * (profil étudiant, préférences, etc.).</p>
+ */
 public class User {
     private int id;
     private String name;
     private String email;
-
+     /**
+     * Construit un {@code User} vide.
+     *
+     * <p>Utilisé pour la sérialisation et la désérialisation JSON.</p>
+     */
     public User() {}
-
+     /**
+     * Construit un utilisateur avec ses informations principales.
+     *
+     * @param id identifiant unique de l’utilisateur
+     * @param name nom de l’utilisateur
+     * @param email adresse courriel de l’utilisateur
+     */
     public User(int id, String name, String email) {
         this.id = id;
         this.name = name;
