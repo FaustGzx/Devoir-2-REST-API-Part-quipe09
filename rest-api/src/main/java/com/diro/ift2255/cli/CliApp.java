@@ -637,4 +637,4 @@ public class CliApp {
 
         menu.pressEnterToContinue();
     }
-git pull}
+}

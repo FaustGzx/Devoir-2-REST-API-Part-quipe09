@@ -138,4 +138,11 @@
   "comment" : "aaaaaaaaaa",
   "author" : "cmpspablo01",
   "timestamp" : 1766540460622
+}, {
+  "courseId" : "IFT2235",
+  "difficulty" : 5,
+  "workload" : 5,
+  "comment" : "test 26 decembre",
+  "author" : "cmpspablo01",
+  "timestamp" : 1766788500931
 } ]
