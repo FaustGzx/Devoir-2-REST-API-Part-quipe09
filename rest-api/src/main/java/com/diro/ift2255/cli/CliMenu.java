@@ -90,6 +90,7 @@ public class CliMenu {
         System.out.println("  2. Voir un ensemble existant");
         System.out.println("  3. Voir l'horaire d'un ensemble");
         System.out.println("  4. Détecter les conflits (BONUS)");
+        System.out.println("  5. Comparer deux ensembles (A vs B)");
         System.out.println("  0. Retour au menu principal");
         System.out.print("Choix : ");
     }

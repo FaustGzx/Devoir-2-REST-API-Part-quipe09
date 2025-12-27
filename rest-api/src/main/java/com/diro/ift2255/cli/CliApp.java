@@ -23,6 +23,8 @@ public class CliApp {
     private final CliMenu menu;
     private final Scanner scanner;
     private boolean running;
+    // Index local (session CLI) : numéro lisible -> UUID d'ensemble
+    private final LinkedHashMap<Integer, String> setIndex = new LinkedHashMap<>();
     /**
     * Construit l’application CLI en configurant l’URL de base du serveur REST.
     *
@@ -469,27 +471,11 @@ public class CliApp {
         }
 
         JsonNode data = response.getData();
-        
-        // Afficher les cours comparés
+
+        // Afficher les CompareItem (inclut avis et résultats agrégés)
         if (data != null && data.isArray()) {
             CliPrinter.printSubtitle("Cours comparés");
-            double totalCredits = 0;
-            
-            for (JsonNode course : data) {
-                CliPrinter.printCourseShort(course);
-                if (course.has("credits") && !course.get("credits").isNull()) {
-                    totalCredits += course.get("credits").asDouble();
-                }
-            }
-
-            System.out.println();
-            CliPrinter.printField("Total crédits", totalCredits);
-            
-            if (totalCredits > 15) {
-                CliPrinter.printWarning("Attention : plus de 15 crédits, charge très élevée !");
-            } else if (totalCredits > 12) {
-                CliPrinter.printWarning("Attention : plus de 12 crédits, charge élevée.");
-            }
+            CliPrinter.printCompareItems(data);
         }
 
         menu.pressEnterToContinue();
@@ -508,6 +494,7 @@ public class CliApp {
             case "2" -> handleViewSet();
             case "3" -> handleSetSchedule();
             case "4" -> handleSetConflicts();
+            case "5" -> handleCompareSets();
             case "0" -> { }
             default -> menu.printInvalidOption();
         }
@@ -539,9 +526,16 @@ public class CliApp {
         if (response.isSuccess()) {
             JsonNode data = response.getData();
             String setId = data.has("id") ? data.get("id").asText() : "?";
-            CliPrinter.printSuccess("Ensemble créé avec succès !");
-            CliPrinter.printField("ID de l'ensemble", setId);
-            CliPrinter.printInfo("Conservez cet ID pour consulter l'ensemble plus tard.");
+
+            // Enregistrer un numéro lisible pour cet ensemble dans la session
+            int num = setIndex.size() + 1;
+            if (setId != null && !"?".equals(setId)) {
+                setIndex.put(num, setId);
+            }
+
+            CliPrinter.printSuccess("Ensemble #" + num + " créé pour " + semester);
+            CliPrinter.printField("UUID interne", setId);
+            CliPrinter.printInfo("Vous pouvez utiliser soit le numéro (ex: 1) soit le UUID complet.");
         } else {
             CliPrinter.printApiError(response);
         }
@@ -552,8 +546,12 @@ public class CliApp {
     private void handleViewSet() {
         CliPrinter.printTitle("Voir un ensemble de cours");
 
-        String setId = menu.askForInput("ID de l'ensemble : ");
-        if (setId.isEmpty()) return;
+        String raw = menu.askForInput("Identifiant de l'ensemble (#num ou UUID) : ");
+        String setId = resolveSetId(raw);
+        if (setId == null) {
+            CliPrinter.printError("Identifiant d'ensemble inconnu. Utilisez un UUID ou un numéro créé dans cette session.");
+            return;
+        }
 
         ApiClient.ApiResponse response = apiClient.get("/sets/" + setId);
 
@@ -583,8 +581,12 @@ public class CliApp {
     private void handleSetSchedule() {
         CliPrinter.printTitle("Horaire d'un ensemble");
 
-        String setId = menu.askForInput("ID de l'ensemble : ");
-        if (setId.isEmpty()) return;
+        String raw = menu.askForInput("Identifiant de l'ensemble (#num ou UUID) : ");
+        String setId = resolveSetId(raw);
+        if (setId == null) {
+            CliPrinter.printError("Identifiant d'ensemble inconnu. Utilisez un UUID ou un numéro créé dans cette session.");
+            return;
+        }
 
         ApiClient.ApiResponse response = apiClient.get("/sets/" + setId + "/schedule");
 
@@ -617,8 +619,12 @@ public class CliApp {
     private void handleSetConflicts() {
         CliPrinter.printTitle("Détecter les conflits d'horaire (BONUS)");
 
-        String setId = menu.askForInput("ID de l'ensemble : ");
-        if (setId.isEmpty()) return;
+        String raw = menu.askForInput("Identifiant de l'ensemble (#num ou UUID) : ");
+        String setId = resolveSetId(raw);
+        if (setId == null) {
+            CliPrinter.printError("Identifiant d'ensemble inconnu. Utilisez un UUID ou un numéro créé dans cette session.");
+            return;
+        }
 
         ApiClient.ApiResponse response = apiClient.get("/sets/" + setId + "/conflicts");
 
@@ -636,5 +642,177 @@ public class CliApp {
         }
 
         menu.pressEnterToContinue();
+    }
+
+    // ========================================================================
+    // Comparer deux ensembles (A vs B)
+    // ========================================================================
+
+    private void handleCompareSets() {
+        CliPrinter.printTitle("Comparer deux ensembles (A vs B)");
+
+        String rawA = menu.askForInput("Ensemble A (#num ou UUID) : ");
+        String rawB = menu.askForInput("Ensemble B (#num ou UUID) : ");
+
+        String idA = resolveSetId(rawA);
+        String idB = resolveSetId(rawB);
+
+        if (idA == null || idB == null) {
+            CliPrinter.printError("Identifiants invalides. Utilisez des UUID ou des numéros connus.");
+            return;
+        }
+
+        ApiClient.ApiResponse respA = apiClient.get("/sets/" + idA + "/schedule");
+        ApiClient.ApiResponse respB = apiClient.get("/sets/" + idB + "/schedule");
+
+        if (!respA.isSuccess()) {
+            CliPrinter.printApiError(respA);
+            menu.pressEnterToContinue();
+            return;
+        }
+        if (!respB.isSuccess()) {
+            CliPrinter.printApiError(respB);
+            menu.pressEnterToContinue();
+            return;
+        }
+
+        // Libellés lisibles (numéro si connu)
+        String labelA = buildSetLabel(idA);
+        String labelB = buildSetLabel(idB);
+
+        printSideBySideSchedules(respA.getData(), labelA, respB.getData(), labelB);
+
+        // Petits résumés
+        double creditsA = sumCredits(respA.getData());
+        double creditsB = sumCredits(respB.getData());
+        int countA = countCourses(respA.getData());
+        int countB = countCourses(respB.getData());
+
+        System.out.println();
+        CliPrinter.printSeparator();
+        CliPrinter.printField("Crédits (A)", creditsA);
+        CliPrinter.printField("Crédits (B)", creditsB);
+        CliPrinter.printField("Cours (A)", countA);
+        CliPrinter.printField("Cours (B)", countB);
+
+        menu.pressEnterToContinue();
+    }
+
+    private String buildSetLabel(String uuid) {
+        for (Map.Entry<Integer, String> e : setIndex.entrySet()) {
+            if (e.getValue().equals(uuid)) {
+                return "Ensemble #" + e.getKey();
+            }
+        }
+        // Fallback: abréger l'UUID
+        return uuid.length() >= 8 ? ("UUID " + uuid.substring(0, 8)) : uuid;
+    }
+
+    private double sumCredits(JsonNode scheduleData) {
+        if (scheduleData == null || !scheduleData.isArray()) return 0.0;
+        double total = 0.0;
+        for (JsonNode course : scheduleData) {
+            if (course.has("credits") && !course.get("credits").isNull()) {
+                total += course.get("credits").asDouble();
+            }
+        }
+        return total;
+    }
+
+    private int countCourses(JsonNode scheduleData) {
+        if (scheduleData == null || !scheduleData.isArray()) return 0;
+        return scheduleData.size();
+    }
+
+    private void printSideBySideSchedules(JsonNode dataA, String labelA, JsonNode dataB, String labelB) {
+        CliPrinter.printSubtitle(labelA + "  vs  " + labelB);
+
+        // Construire les lignes pour A et B (cours + premier créneau)
+        List<String> linesA = buildCourseLines(dataA);
+        List<String> linesB = buildCourseLines(dataB);
+
+        int max = Math.max(linesA.size(), linesB.size());
+        int width = 50; // largeur colonne
+
+        System.out.println();
+        System.out.printf("%-" + width + "s %s%n", "CHEMIN A (" + labelA + ")", "CHEMIN B (" + labelB + ")");
+        System.out.println("-".repeat(width) + " " + "-".repeat(width));
+
+        for (int i = 0; i < max; i++) {
+            String left = i < linesA.size() ? linesA.get(i) : "";
+            String right = i < linesB.size() ? linesB.get(i) : "";
+            if (left.length() > width) left = left.substring(0, width - 3) + "...";
+            if (right.length() > width) right = right.substring(0, width - 3) + "...";
+            System.out.printf("%-" + width + "s %s%n", left, right);
+        }
+    }
+
+    private List<String> buildCourseLines(JsonNode data) {
+        List<String> out = new ArrayList<>();
+        if (data == null || !data.isArray()) return out;
+
+        for (JsonNode course : data) {
+            String id = course.has("id") ? course.get("id").asText() : "?";
+            String name = course.has("name") ? course.get("name").asText() : "";
+            String slot = firstSlot(course);
+            String line = String.format("%s  %s%s", id, name, (slot != null ? "  " + slot : ""));
+            out.add(line);
+        }
+        return out;
+    }
+
+    private String firstSlot(JsonNode course) {
+        if (course == null || !course.has("schedules")) return null;
+        JsonNode schedules = course.get("schedules");
+        if (!schedules.isArray()) return null;
+        for (JsonNode schedule : schedules) {
+            if (!schedule.has("sections")) continue;
+            JsonNode sections = schedule.get("sections");
+            if (!sections.isArray() || sections.isEmpty()) continue;
+            JsonNode section = sections.get(0);
+            if (section.has("volets") && section.get("volets").isArray()) {
+                for (JsonNode volet : section.get("volets")) {
+                    if (volet.has("activities") && volet.get("activities").isArray()) {
+                        for (JsonNode activity : volet.get("activities")) {
+                            StringBuilder sb = new StringBuilder();
+                            if (activity.has("days") && activity.get("days").isArray() && activity.get("days").size() > 0) {
+                                sb.append(activity.get("days").get(0).asText()).append(" ");
+                            }
+                            String start = activity.has("start_time") ? activity.get("start_time").asText() : null;
+                            String end = activity.has("end_time") ? activity.get("end_time").asText() : null;
+                            if (start != null && end != null) {
+                                sb.append(start).append("–").append(end);
+                            }
+                            return sb.length() > 0 ? sb.toString() : null;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Resolve un identifiant d'ensemble fourni par l'utilisateur.
+     * Accepte : "1", "#1", "Ensemble #1" ou un UUID.
+     */
+    private String resolveSetId(String input) {
+        if (input == null) return null;
+        String in = input.trim();
+
+        // Numéro au format simple
+        if (in.matches("^(?i)(ensemble\s*)?#?\\d+$")) {
+            String digits = in.replaceAll("[^0-9]", "");
+            try {
+                int num = Integer.parseInt(digits);
+                return setIndex.getOrDefault(num, null);
+            } catch (NumberFormatException ignored) { }
+        }
+
+        // UUID (format standard)
+        if (in.matches("(?i)^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")) {
+            return in.toLowerCase();
+        }
+        return null;
     }
 }

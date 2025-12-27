@@ -431,6 +431,81 @@ public class CliPrinter {
     }
 
     // ========================================================================
+    // Affichage CompareItem (compare-full)
+    // ========================================================================
+
+    public static void printCompareItems(JsonNode items) {
+        if (items == null || !items.isArray() || items.isEmpty()) {
+            printInfo("Aucune donnée de comparaison.");
+            return;
+        }
+
+        // En-tête
+        System.out.printf("%-10s %-45s %-5s %-10s %-10s %-10s %-12s %-10s%n",
+            "Sigle", "Nom", "Rev#", "DiffMoy", "ChargeMoy", "CSVScore", "Participants", "Moyenne");
+        System.out.println("-".repeat(120));
+
+        double totalCsvScore = 0.0;
+        double totalDiff = 0.0;
+        double totalWork = 0.0;
+        int countDiff = 0;
+        int countWork = 0;
+
+        for (JsonNode item : items) {
+            String id = getTextSafe(item, "id");
+            String name = getTextSafe(item, "name");
+            Integer reviewCount = item.has("reviewCount") && !item.get("reviewCount").isNull()
+                    ? item.get("reviewCount").asInt() : null;
+            Double avgDiff = item.has("avgDifficulty") && !item.get("avgDifficulty").isNull()
+                    ? item.get("avgDifficulty").asDouble() : null;
+            Double avgWork = item.has("avgWorkload") && !item.get("avgWorkload").isNull()
+                    ? item.get("avgWorkload").asDouble() : null;
+            Double csvScore = item.has("csvScore") && !item.get("csvScore").isNull()
+                    ? item.get("csvScore").asDouble() : null;
+            Integer participants = item.has("participants") && !item.get("participants").isNull()
+                    ? item.get("participants").asInt() : null;
+            String moyenne = getTextSafe(item, "moyenne");
+
+            if (csvScore != null) totalCsvScore += csvScore;
+            if (avgDiff != null) { totalDiff += avgDiff; countDiff++; }
+            if (avgWork != null) { totalWork += avgWork; countWork++; }
+
+                System.out.printf("%-10s %-45s %-5s %-10s %-10s %-10s %-12s %-10s%n",
+                    safe(id),
+                    truncate(name, 45),
+                    reviewCount != null ? reviewCount : "-",
+                    avgDiff != null ? String.format("%.1f", avgDiff) : "-",
+                    avgWork != null ? String.format("%.1f", avgWork) : "-",
+                    csvScore != null ? String.format("%.1f", csvScore) : "-",
+                    participants != null ? participants : "-",
+                    moyenne != null ? moyenne : "-");
+        }
+
+        // Résumé
+        System.out.println();
+        printSubtitle("Résumé comparatif");
+        if (countDiff > 0) {
+            printField("Difficulté moyenne", String.format("%.1f / 5", totalDiff / countDiff));
+        }
+        if (countWork > 0) {
+            printField("Charge moyenne", String.format("%.1f / 5", totalWork / countWork));
+        }
+        if (items.size() > 0) {
+            printField("Score CSV moyen", String.format("%.1f / 5", totalCsvScore / items.size()));
+        }
+    }
+
+    private static String safe(String v) {
+        return v == null ? "" : v;
+    }
+
+    private static String truncate(String v, int max) {
+        if (v == null) return "";
+        if (v.length() <= max) return v;
+        return v.substring(0, max - 3) + "...";
+    }
+
+    // ========================================================================
     // Utilitaires
     // ========================================================================
 
