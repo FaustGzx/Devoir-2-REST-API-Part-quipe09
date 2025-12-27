@@ -387,51 +387,10 @@ public class CliPrinter {
         }
     }
 
-    // ========================================================================
-    // Affichage comparaison
-    // ========================================================================
-
-    public static void printComparison(JsonNode comparison) {
-        if (comparison == null || comparison.isNull()) return;
-
-        // Cours comparés
-        if (comparison.has("courses") && comparison.get("courses").isArray()) {
-            printSubtitle("Cours comparés");
-            for (JsonNode course : comparison.get("courses")) {
-                printCourseShort(course);
-            }
-        }
-
-        // Résumé
-        if (comparison.has("summary")) {
-            JsonNode summary = comparison.get("summary");
-            System.out.println();
-            printSubtitle("Comparaison");
-            
-            if (summary.has("totalCredits")) {
-                printField("Total crédits", summary.get("totalCredits").asDouble());
-            }
-            if (summary.has("estimatedWorkload")) {
-                printField("Charge estimée", summary.get("estimatedWorkload").asText());
-            }
-        }
-
-        // Critères détaillés
-        if (comparison.has("criteria") && comparison.get("criteria").isArray()) {
-            System.out.println();
-            printSubtitle("Détails par critère");
-            for (JsonNode criterion : comparison.get("criteria")) {
-                String name = getTextSafe(criterion, "name");
-                String value = getTextSafe(criterion, "value");
-                if (name != null) {
-                    printField(name, value);
-                }
-            }
-        }
-    }
+    
 
     // ========================================================================
-    // Affichage CompareItem (compare-full)
+    // Affichage CompareItem
     // ========================================================================
 
     public static void printCompareItems(JsonNode items) {
