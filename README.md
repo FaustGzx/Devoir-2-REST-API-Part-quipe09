@@ -198,18 +198,66 @@ API_BASE_URL=http://localhost:7070 java -jar target/ift2255-cli.jar
 mvn exec:java@cli -Dexec.args="--baseUrl=http://localhost:7070"
 ```
 
-## Fonctionnalités de la CLI
 
-La CLI permet notamment de :
 
-- Rechercher des cours
-- Consulter les détails d'un cours
-- Afficher les cours offerts par trimestre
-- Vérifier l'éligibilité à un cours
-- Consulter les résultats académiques
-- Comparer des cours et estimer la charge totale
-- Gérer des ensembles de cours
-- Consulter les avis étudiants
+## Fonctionnalités par rôle
+
+### Utilisateur (Étudiant)
+
+L’étudiant utilise CLI pour interagir avec l’outil.
+Il peut :
+
+- Rechercher des cours par sigle, préfixe, nom ou description
+
+- Consulter les détails complets d’un cours (crédits, prérequis, sessions offertes)
+
+- Afficher l’horaire d’un cours pour un trimestre donné
+
+- Vérifier son éligibilité à un cours en fonction des prérequis et du cycle d’études
+
+- Consulter les résultats académiques agrégés d’un cours (score, moyenne, participants)
+
+- Comparer plusieurs cours afin d’estimer la difficulté et la charge de travail
+
+- Créer des ensembles de cours représentant des chemins de session possibles
+
+- Visualiser l’horaire résultant d’un ensemble de cours
+
+- Détecter les conflits d’horaire dans un ensemble de cours (bonus)
+
+- Comparer deux ensembles de cours afin d’évaluer différents scénarios de session
+
+### Bot Discord (Collecte d’avis)
+
+Le bot Discord est un point d’entrée pour la collecte des avis étudiants.
+Il permet :
+
+- De recueillir des avis étudiants via un canal Discord dédié
+
+- D’extraire automatiquement la difficulté, la charge de travail et les commentaires
+
+- De transmettre ces avis à l’API REST via l’endpoint POST /avis
+
+- Enrichir les données de comparaison des cours à partir d’expériences réelles d’étudiants
+
+### API REST (Serveur)
+
+Le serveur REST est le cœur du système et expose les fonctionnalités via des endpoints HTTP.
+Il est responsable de :
+
+- Fournir l’accès au catalogue officiel des cours et aux horaires (via Planifium)
+
+- Agréger les résultats académiques à partir des fichiers CSV
+
+- Gérer la persistance et la consultation des avis étudiants
+
+- Valider les requêtes et paramètres reçus
+
+- Appliquer la logique métier (comparaisons, agrégations, calculs)
+
+- Gérer la création et l’analyse des ensembles de cours
+
+- Exposer une interface stable et réutilisable par différents clients (CLI, bot, future interface graphique)
 
 ## Endpoints de l'API REST
 
